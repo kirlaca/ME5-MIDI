@@ -1,0 +1,11 @@
+{
+  "files.exclude": {
+    "**/.git": true
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+  "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
+  "liveServer.settings.root": "/",
+  "liveServer.settings.port": 5500,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": true
+}
