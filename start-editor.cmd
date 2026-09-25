@@ -2,9 +2,8 @@
 rem Starts the ME-5 editor: runs the backend in this window and opens the editor in the browser.
 rem Close this window (or press Ctrl+C) to stop the server.
 setlocal
-rem Portable Python in tools\python (see tools\setup-python.cmd); an old backend\.venv still works as a fallback.
+rem Portable Python in tools\python (see tools\setup-python.cmd).
 set "PY=%~dp0tools\python\python.exe"
-if not exist "%PY%" set "PY=%~dp0backend\.venv\Scripts\python.exe"
 set "URL=http://localhost:8000/"
 rem Health checks go to 127.0.0.1: "localhost" tries IPv6 first, which uvicorn does not listen on.
 set "CHECK=http://127.0.0.1:8000/api/params"

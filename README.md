@@ -134,7 +134,7 @@ User manual (Hungarian): [HASZNALATI_UTASITAS.md](HASZNALATI_UTASITAS.md), also 
 
 ### Portable Python
 
-The backend runs on a portable Python in `tools/python/` (the official Windows embeddable package, ~55 MB with the packages), so the whole folder can be copied to another place or PC and started there. `start-editor.cmd`, the VS Code tasks and the launch config all use it. The folder is git-ignored; after a fresh clone run `tools\setup-python.cmd`, which downloads Python, adds pip and installs `backend/requirements.txt` into it. Run it again to update the packages. An old `backend/.venv` is still used by `start-editor.cmd` as a fallback, but is no longer needed.
+The backend runs on a portable Python in `tools/python/` (the official Windows embeddable package, ~55 MB with the packages), so the whole folder can be copied to another place or PC and started there. `start-editor.cmd`, the VS Code tasks and the launch config all use it. The folder is git-ignored; after a fresh clone run `tools\setup-python.cmd`, which downloads Python, adds pip and installs `backend/requirements.txt` into it. Run it again to update the packages.
 
 ### Portable VS Code
 

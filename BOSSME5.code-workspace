@@ -17,12 +17,10 @@
     },
     "search.exclude": {
       "tools/**": true,
-      "backend/.venv/**": true,
       "js/jquery-*.js": true
     },
     "files.watcherExclude": {
       "**/tools/vscode/**": true,
-      "**/backend/.venv/**": true,
       "**/tools/python/**": true
     }
   },
