@@ -94,6 +94,22 @@ def send_sysex_and_wait(
     return received
 
 
+def send_message(out_port_name: str, data: list[int]) -> None:
+    """Fire-and-forget send (Program Change, DT1 edit-buffer updates) -
+    DT1 has no reply, so waiting like send_sysex_and_wait would only add
+    latency while knobs are being turned."""
+    midiout = rtmidi.MidiOut()
+    try:
+        out_ports = midiout.get_ports()
+        if out_port_name not in out_ports:
+            raise MidiPortNotFound(f"output port not found: {out_port_name}")
+        midiout.open_port(out_ports.index(out_port_name))
+        midiout.send_message(data)
+    finally:
+        midiout.close_port()
+        del midiout
+
+
 @dataclass
 class DetectedPort:
     output: str

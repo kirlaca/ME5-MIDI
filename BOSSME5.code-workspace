@@ -1,0 +1,57 @@
+{
+  "folders": [
+    { "name": "BOSSME5", "path": "." }
+  ],
+  "settings": {
+    "window.title": "ME-5 Editor${separator}${activeEditorShort}",
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+    "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
+    "python.terminal.activateEnvironment": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": true,
+    "[python]": { "editor.tabSize": 4 },
+    "files.exclude": {
+      "**/.git": true,
+      "**/__pycache__": true,
+      "tools/vscode": true
+    },
+    "search.exclude": {
+      "tools/**": true,
+      "backend/.venv/**": true,
+      "js/jquery-*.js": true
+    },
+    "files.watcherExclude": {
+      "**/tools/vscode/**": true,
+      "**/backend/.venv/**": true
+    }
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "ME-5 Editor (backend + open browser)",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "uvicorn",
+        "args": ["app.main:app", "--reload", "--port", "8000"],
+        "cwd": "${workspaceFolder}/backend",
+        "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+        "jinja": false,
+        "justMyCode": true,
+        "serverReadyAction": {
+          "pattern": "Uvicorn running on (https?://\\S+)",
+          "uriFormat": "%s",
+          "action": "openExternally"
+        }
+      }
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "ms-python.debugpy",
+      "esbenp.prettier-vscode"
+    ]
+  }
+}

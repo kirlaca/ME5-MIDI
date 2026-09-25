@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ME-5 Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-model">ME-5</span>
+      <span class="brand-sub">Guitar Multiple Effects</span>
+      <span class="brand-tag">Editor</span>
+    </div>
+    <button id="conn-status" class="status" type="button">
+      <span class="dot"></span><span id="conn-text">Offline</span>
+    </button>
+  </header>
+
+  <section class="unit">
+    <div class="patch-nav">
+      <button id="prev" class="nav-btn" type="button" aria-label="Previous patch">&#9664;</button>
+      <div class="display" aria-live="polite">
+        <span id="patch-label" class="display-digits">-·-·-</span>
+        <span class="display-meta">
+          <span id="patch-num">#--</span>
+          <span id="edited" class="edited">EDIT</span>
+        </span>
+      </div>
+      <button id="next" class="nav-btn" type="button" aria-label="Next patch">&#9654;</button>
+    </div>
+
+    <div class="actions">
+      <button id="store" class="btn" type="button" title="Write the edited sound into the current patch">Write</button>
+      <button id="revert" class="btn" type="button" title="Throw away edits to this patch">Revert</button>
+      <span class="sep"></span>
+      <button id="lib-factory" class="btn" type="button">Factory</button>
+      <button id="lib-load" class="btn" type="button">Load file…</button>
+      <button id="lib-save" class="btn" type="button">Save file…</button>
+      <button id="lib-read" class="btn" type="button" title="Read all 64 patches from the ME-5">Read ME-5</button>
+      <span id="source" class="source"></span>
+    </div>
+  </section>
+
+  <details class="patch-map" open>
+    <summary>Patches</summary>
+    <div id="patch-map" class="pm-groups"></div>
+  </details>
+
+  <main class="board">
+    <div id="chain" class="chain"></div>
+  </main>
+
+  <dialog id="conn-dialog">
+    <form method="dialog">
+      <h2>MIDI connection</h2>
+      <p class="hint">Auto-detect sends an identity request on every port pair. Picking ports by hand works for
+        patch changes even when SysEx replies don't come back.</p>
+      <label class="field">Output (to ME-5)<select id="port-out"></select></label>
+      <label class="field">Input (from ME-5)<select id="port-in"></select></label>
+      <p id="conn-msg" class="hint"></p>
+      <div class="dialog-actions">
+        <button id="conn-disconnect" class="btn" type="button">Go offline</button>
+        <button id="conn-detect" class="btn" type="button">Auto-detect</button>
+        <button id="conn-use" class="btn primary" type="button">Use these ports</button>
+        <button class="btn" value="cancel">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="file-dialog">
+    <form method="dialog">
+      <h2 id="file-title">Files</h2>
+      <ul id="file-list" class="file-list"></ul>
+      <label id="file-name-row" class="field">File name<input id="file-name" type="text" autocomplete="off"
+          spellcheck="false"></label>
+      <div class="dialog-actions">
+        <button class="btn" value="cancel">Cancel</button>
+        <button id="file-ok" class="btn primary" type="button">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

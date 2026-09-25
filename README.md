@@ -121,3 +121,20 @@ You can have the code under the following conditions:
 Do not delete the headers. I once wrote a book on integrated optics under contract at the university. The minute my contract ended my name vanished from this very book. Suddenly the head of the department was the author!
 
 Absolutely no warranty whatsoever, use it at your own risk (I use it now for some 3 years, no smoke yet).
+
+---
+
+## Laptop port (this fork)
+
+The Raspberry Pi/PHP layer is being replaced by a Python backend (`backend/`, FastAPI + python-rtmidi) and a new pedalboard-style editor (`frontend/`). The original `me-5-USB.html`, `js/`, `css/` and `php/` are kept for reference.
+
+Run: start the backend (VS Code task "Backend: Start FastAPI server", or the "ME-5 Editor" launch config) and open http://localhost:8000/.
+
+### Portable VS Code
+
+`start-vscode.cmd` opens `BOSSME5.code-workspace` in a portable VS Code under `tools/vscode/`. Its settings and extensions stay in `tools/vscode/data/`, separate from any installed VS Code. The folder is git-ignored, so after a fresh clone set it up again:
+
+1. Download the Windows x64 **.zip** from https://code.visualstudio.com/download and extract it to `tools/vscode/`.
+2. Create an empty `tools/vscode/data/` folder. This switches VS Code to portable mode.
+3. Install the extensions:
+   `tools\vscode\bin\code.cmd --install-extension ms-python.python --install-extension esbenp.prettier-vscode`
