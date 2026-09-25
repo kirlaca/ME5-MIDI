@@ -2,6 +2,8 @@
 
 A BOSS ME-5 gitár-multieffekt laptopos szerkesztője. A böngészőben egy virtuális pedalboard jelenik meg, a pedálok ugyanabban a sorrendben állnak, mint a jel útja az ME-5-ben. A program USB-MIDI kábelen keresztül beszél az ME-5-tel, de kábel nélkül is használható.
 
+Ez az útmutató az editorból is elérhető: a felső sáv **Útmutató** linkje (`frontend/utmutato.html`). Az ME-5 történetét a **Bemutató** oldal mutatja be (`frontend/bemutato.html`).
+
 ## Miért készült?
 
 Az ME-5 egy régi, de nagyon jól szóló eszköz, a kezelése viszont nehézkes. Egy hangzás beállításához patchenként egyenként kell végiglépkedni a paramétereken, közben le kell hajolni a pedálhoz, és egy apró kijelzőn kell követni, mi hol tart. Próbán vagy koncert előtt, amikor gyorsan kellene a hangot az adott erősítőhöz igazítani, ez különösen lassú.
@@ -82,6 +84,7 @@ Offline módban minden szerkesztés csak az editorban történik, az ME-5-re nem
 | **Factory** | Betölti a 64 gyári patchet az editorba. |
 | **Load file…** / **Save file…** | Mind a 64 patchet `.syx` fájlba menti, vagy fájlból tölti be (részletek a 7. pontban). |
 | **Read ME-5** | Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható. |
+| **Útmutató** / **Bemutató** | Ez a használati utasítás, illetve az ME-5 történetét bemutató oldal, az editorból megnyitva. |
 
 ### Patches (patchtérkép)
 

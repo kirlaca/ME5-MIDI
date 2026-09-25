@@ -130,7 +130,7 @@ The Raspberry Pi/PHP layer is being replaced by a Python backend (`backend/`, Fa
 
 Run: start the backend (VS Code task "Backend: Start FastAPI server", or the "ME-5 Editor" launch config) and open http://localhost:8000/.
 
-User manual (Hungarian): [HASZNALATI_UTASITAS.md](HASZNALATI_UTASITAS.md)
+User manual (Hungarian): [HASZNALATI_UTASITAS.md](HASZNALATI_UTASITAS.md), also served by the editor at `/utmutato.html`; the ME-5 presentation page is at `/bemutato.html`.
 
 ### Portable VS Code
 

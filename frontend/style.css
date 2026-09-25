@@ -47,6 +47,11 @@ button { font: inherit; color: inherit; }
 .brand-sub { color: var(--accent); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; }
 .brand-tag { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
 
+.topbar-right { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.doc-links { display: flex; gap: 14px; }
+.doc-links a { color: var(--muted); font-size: 13px; letter-spacing: .06em; text-decoration: none; }
+.doc-links a:hover, .doc-links a:focus-visible { color: var(--accent); }
+
 .status {
   display: inline-flex;
   align-items: center;

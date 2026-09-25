@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ME-5 – Bemutató</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="pagenav" aria-label="Oldalak">
+    <a class="pagenav-brand" href="./">ME-5 Editor</a>
+    <div class="pagenav-links">
+      <a href="bemutato.html" aria-current="page">Bemutató</a>
+      <a href="utmutato.html">Útmutató</a>
+      <a class="open" href="./">Editor megnyitása</a>
+    </div>
+  </nav>
+  <header class="hero">
+    <div class="hero-top">
+      <div class="stack">
+        <span class="label">BOSS ME-5 · Guitar Multiple Effects · 1988</span>
+        <h1>Analóg legenda,<br><span>újra kézre állítva</span></h1>
+      </div>
+      <div class="lcd" aria-label="2028-ban lesz 40 éves">
+        <span class="lcd-digits">1988</span>
+        <span class="lcd-cap">2028-ban 40 éves</span>
+      </div>
+    </div>
+    <p class="lede">A BOSS első padlóra tehető multieffektje. Csaknem negyven éve készült, a hangja ma is analóg, és MIDI-n keresztül ma is programozható. Az <strong>ME-5 Editor</strong> ezt a régi, nehézkesen kezelhető eszközt teszi egyetlen áttekinthető képernyőről állíthatóvá.</p>
+
+    <div class="chain-box">
+      <div class="chain-head">
+        <span class="label">A jelút, ahogy az ME-5 paneljén áll</span>
+        <span class="muted" style="font-size:14px">Kattints egy pedálra a be- és kikapcsoláshoz</span>
+      </div>
+      <div class="chain-scroll">
+        <div class="chain" id="chain">
+          <span class="jack">INPUT</span>
+          <button class="pedal" type="button" aria-pressed="true" style="--c:#2f7fc1;--ink:#fff">
+            <span class="pedal-slot">1<span class="led"></span></span>
+            <span class="pedal-what">Kompresszor</span>
+            <span class="plate"><b>CS-2</b><small>Compression Sustainer</small></span>
+          </button>
+          <button class="pedal" type="button" aria-pressed="true" style="--c:#ee6a1f">
+            <span class="pedal-slot">2<span class="led"></span></span>
+            <span class="pedal-what">Overdrive / Distortion</span>
+            <span class="plate"><b>OD-2 · DS-1</b><small>OverDrive · Distortion</small></span>
+          </button>
+          <button class="pedal" type="button" aria-pressed="false" style="--c:#c9cdd2">
+            <span class="pedal-slot">3<span class="led"></span></span>
+            <span class="pedal-what">Equalizer</span>
+            <span class="plate"><b>GE-7</b><small>Equalizer</small></span>
+          </button>
+          <button class="pedal" type="button" aria-pressed="true" style="--c:#8fd0e8">
+            <span class="pedal-slot">4<span class="led"></span></span>
+            <span class="pedal-what">Chorus / Flanger</span>
+            <span class="plate"><b>CE-2 · BF-2</b><small>Chorus · Flanger</small></span>
+          </button>
+          <button class="pedal" type="button" aria-pressed="true" style="--c:#ecebe4">
+            <span class="pedal-slot">NS<span class="led"></span></span>
+            <span class="pedal-what">Zajzár</span>
+            <span class="plate"><b>NS-2</b><small>Noise Suppressor</small></span>
+          </button>
+          <button class="pedal digital" type="button" aria-pressed="true" style="--c:#27406f;--ink:#fff">
+            <span class="pedal-slot">B<span class="led"></span></span>
+            <span class="pedal-what">Reverb / Delay</span>
+            <span class="plate"><b>RV-2 · DD-2</b><small>Reverb · Delay</small></span>
+          </button>
+          <span class="jack">OUTPUT</span>
+        </div>
+      </div>
+      <div class="legend">
+        <span><b>Analóg:</b> kompresszor, overdrive/distortion, EQ, chorus/flanger</span>
+        <span><b>Digitális:</b> csak a zengető és a késleltető</span>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="two">
+      <div class="stack">
+        <span class="label">Történet</span>
+        <h2>A legnépszerűbb BOSS pedálok egyetlen dobozban</h2>
+        <p>1988-ban a BOSS célja egyszerű volt: a gitáros a kedvenc kompakt pedáljait egy dobozban kapja meg, programozhatóan, egyetlen taposással előhívható hangzásokkal. A kompresszor, a torzítás, az EQ és a chorus/flanger valódi analóg kapcsolás, a korszak BOSS pedáljainak belsejéből.</p>
+        <p class="muted">Ma, amikor szinte minden multieffekt modellezésre épül, egy analóg hangú, programozható multieffekt kuriózum, és a gyűjtők is keresik.</p>
+      </div>
+      <ol class="timeline" aria-label="Idővonal">
+        <li><span class="year">1987</span><span><strong>Roland GP-8.</strong> Megjelenik a világ első multieffekt-processzora.</span></li>
+        <li><span class="year">1988</span><span><strong>BOSS ME-5.</strong> A BOSS első padlóra tehető multieffektje, Japánban gyártva, kb. 550 fontért.</span></li>
+        <li><span class="year">1995</span><span><strong>BOSS ME-8.</strong> Az utód olcsóbb, és több effektet tud.</span></li>
+        <li class="now"><span class="year">2028</span><span><strong>40 éves az ME-5.</strong> Az ME-5 Editorral laptopról is kezelhető.</span></li>
+      </ol>
+    </div>
+
+    <div class="specs" role="list">
+      <div class="spec" role="listitem"><span class="spec-val">5</span><span class="spec-cap">effektblokk + zajzár</span></div>
+      <div class="spec" role="listitem"><span class="spec-val">64</span><span class="spec-cap">tárolható patch</span></div>
+      <div class="spec" role="listitem"><span class="spec-val">0</span><span class="spec-cap">potméter a panelen</span></div>
+      <div class="spec" role="listitem"><span class="spec-val">IN / OUT</span><span class="spec-cap">MIDI csatlakozó, már 1988-ban</span></div>
+      <div class="spec" role="listitem"><span class="spec-val">£550</span><span class="spec-cap">ár megjelenéskor</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="stack">
+      <span class="label">A gyenge pont és a megoldás</span>
+      <h2>Nagyszerű hang, nehézkes kezelés</h2>
+    </div>
+    <div class="compare">
+      <div class="side old">
+        <h3>A pedálon</h3>
+        <ul>
+          <li>Egyetlen potméter sincs, csak öt taposó, néhány gomb és egy apró kijelző.</li>
+          <li>Minden paramétert egyenként kell léptetni, lehajolva a padlóhoz.</li>
+          <li>Egyszerre egy értéket látsz, az egész patchet sosem.</li>
+          <li>Próbán vagy koncert előtt kifejezetten lassú.</li>
+        </ul>
+      </div>
+      <div class="side new">
+        <h3>Az ME-5 Editorral</h3>
+        <ul>
+          <li>Az egész patch egy képernyőn, pedálokként kirajzolva.</li>
+          <li>Minden gomb egérrel, görgővel vagy billentyűzettel állítható.</li>
+          <li>A változás tekerés közben megszólal a pedálon.</li>
+          <li>Elég egy laptop és egy USB-MIDI kábel.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="stack">
+      <span class="label">Mit tud az Editor</span>
+      <h2>Az 1988-as MIDI csatlakozóra épül</h2>
+    </div>
+    <ul class="features">
+      <li><b>Virtuális pedalboard</b><span>Minden blokk annak a BOSS pedálnak a kinézetét kapja, amelyiket megszólaltatja, a jelút sorrendjében.</span></li>
+      <li><b>Azonnal hallható</b><span>A tekerés kb. egytized másodperc alatt átmegy a pedálra, a Write gomb pedig véglegesen elmenti.</span></li>
+      <li><b>64 patch egy pillantással</b><span>A patchtérképen színes pöttyök mutatják, melyik patchben mi van bekapcsolva.</span></li>
+      <li><b>Mentés és visszatöltés</b><span>A teljes hangzáskészlet .syx fájlba menthető, a gyári patchek bármikor visszahozhatók.</span></li>
+      <li><b>Kábel nélkül is</b><span>Offline módban is szerkeszthetsz, és a gyári patcheket is böngészheted.</span></li>
+      <li><b>Raspberry Pi nélkül</b><span>arjenv eredeti, Raspberry Pi-s projektjére épül, de ez a változat közvetlenül laptopról fut.</span></li>
+    </ul>
+    <div class="closer">
+      <span class="label">ME-5 Editor</span>
+      <p class="big">Analóg hangú klasszikus, mai kezelőfelülettel.</p>
+      <p class="muted"><a href="./">Editor megnyitása</a> · <a href="utmutato.html">Használati utasítás</a> · Forráskód: <a href="https://github.com/kirlaca/ME5-MIDI">github.com/kirlaca/ME5-MIDI</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Rajongói projekt, a BOSS / Roland Corporationnel nincs kapcsolatban. A BOSS és az ME-5 a Roland Corporation védjegyei.</p>
+    <span class="label" style="color:var(--muted)">Források</span>
+    <ul>
+      <li><a href="https://articles.boss.info/the-complete-guide-to-the-boss-me-multi-effects-series/">The Complete Guide to the BOSS ME Multi-Effects Series – BOSS Articles</a></li>
+      <li><a href="https://planetbotch.blogspot.com/2011/10/boss-me-5-guitar-multi-effects-unit.html">Boss ME-5 Guitar Multi-Effects Unit – Planet Botch</a></li>
+      <li><a href="https://www.effectsdatabase.com/model/boss/multi/me5">Boss ME-5 – Effects Database</a></li>
+      <li><a href="https://www.guitar-list.com/boss/scans/1988-01-01t000000/boss-me-5-ultimate-treatment-no-side-effects">„The ultimate treatment with no side effects!” – 1988-as hirdetés, guitar-list</a></li>
+      <li><a href="https://reverb.com/p/boss-me-5-guitar-multiple-effects">Boss ME-5 Guitar Multiple Effects – Reverb</a></li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+  document.getElementById('chain').addEventListener('click', e => {
+    const pedal = e.target.closest('.pedal');
+    if (!pedal) return;
+    pedal.setAttribute('aria-pressed', String(pedal.getAttribute('aria-pressed') !== 'true'));
+  });
+</script>
+</body>
+</html>
