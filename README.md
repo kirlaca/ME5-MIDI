@@ -130,6 +130,8 @@ The Raspberry Pi/PHP layer is being replaced by a Python backend (`backend/`, Fa
 
 Run: start the backend (VS Code task "Backend: Start FastAPI server", or the "ME-5 Editor" launch config) and open http://localhost:8000/.
 
+User manual (Hungarian): [HASZNALATI_UTASITAS.md](HASZNALATI_UTASITAS.md)
+
 ### Portable VS Code
 
 `start-vscode.cmd` opens `BOSSME5.code-workspace` in a portable VS Code under `tools/vscode/`. Its settings and extensions stay in `tools/vscode/data/`, separate from any installed VS Code. The folder is git-ignored, so after a fresh clone set it up again:
