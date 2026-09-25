@@ -2,7 +2,7 @@
   "files.exclude": {
     "**/.git": true
   },
-  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+  "python.defaultInterpreterPath": "${workspaceFolder}/tools/python/python.exe",
   "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
   "liveServer.settings.root": "/",
   "liveServer.settings.port": 5500,

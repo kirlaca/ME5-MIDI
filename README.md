@@ -128,9 +128,13 @@ Absolutely no warranty whatsoever, use it at your own risk (I use it now for som
 
 The Raspberry Pi/PHP layer is being replaced by a Python backend (`backend/`, FastAPI + python-rtmidi) and a new pedalboard-style editor (`frontend/`). The original `me-5-USB.html`, `js/`, `css/` and `php/` are kept for reference.
 
-Run: start the backend (VS Code task "Backend: Start FastAPI server", or the "ME-5 Editor" launch config) and open http://localhost:8000/.
+Run: double-click `start-editor.cmd` (starts the backend and opens the editor in the browser; close its window to stop). `create-shortcut.cmd` puts an "ME-5 Editor" shortcut with the ME-5 icon (`frontend/me5.ico`) on the desktop and in the project folder; run it again after moving the folder. Or start the backend yourself (VS Code task "Backend: Start FastAPI server", or the "ME-5 Editor" launch config) and open http://localhost:8000/.
 
 User manual (Hungarian): [HASZNALATI_UTASITAS.md](HASZNALATI_UTASITAS.md), also served by the editor at `/utmutato.html`; the ME-5 presentation page is at `/bemutato.html`.
+
+### Portable Python
+
+The backend runs on a portable Python in `tools/python/` (the official Windows embeddable package, ~55 MB with the packages), so the whole folder can be copied to another place or PC and started there. `start-editor.cmd`, the VS Code tasks and the launch config all use it. The folder is git-ignored; after a fresh clone run `tools\setup-python.cmd`, which downloads Python, adds pip and installs `backend/requirements.txt` into it. Run it again to update the packages. An old `backend/.venv` is still used by `start-editor.cmd` as a fallback, but is no longer needed.
 
 ### Portable VS Code
 

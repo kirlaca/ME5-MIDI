@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ME-5 Editor</title>
+  <link rel="icon" href="me5.svg" type="image/svg+xml">
+  <link rel="icon" href="me5.ico" sizes="any">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -40,6 +42,9 @@
     <div class="actions">
       <button id="store" class="btn" type="button" title="Write the edited sound into the current patch">Write</button>
       <button id="revert" class="btn" type="button" title="Throw away edits to this patch">Revert</button>
+      <label class="toggle" title="Write edits into the current patch automatically, 5 s after the last change">
+        <input id="auto-write" type="checkbox"> Auto write
+      </label>
       <span class="sep"></span>
       <button id="lib-factory" class="btn" type="button">Factory</button>
       <button id="lib-load" class="btn" type="button">Load file…</button>

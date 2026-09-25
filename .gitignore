@@ -1,2 +1,7 @@
 # Portable VS Code (~1 GB with extensions) - local only, see start-vscode.cmd
 tools/vscode/
+# Portable Python (~55 MB) - local only, rebuild with tools/setup-python.cmd
+tools/python/
+
+# Created by create-shortcut.cmd - holds absolute paths
+/ME-5 Editor.lnk

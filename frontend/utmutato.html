@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ME-5 – Használati utasítás</title>
+  <link rel="icon" href="me5.svg" type="image/svg+xml">
+  <link rel="icon" href="me5.ico" sizes="any">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap">
@@ -79,16 +81,16 @@
       <p class="note"><strong>Próba:</strong> csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Ezután a <strong>Read ME-5</strong> gombbal ellenőrizheted, hogy a SysEx is átmegy-e: ha sikerül, a program kiolvassa mind a 64 patchet.</p>
 
       <h2 id="telepites"><span class="num">2</span>Első telepítés</h2>
-      <p>Egyszer kell megcsinálni, a <code>backend</code> mappában:</p>
-<pre><code>cd backend
-python -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt</code></pre>
+      <p>Egyszer kell megcsinálni: kattints duplán a <code>tools\setup-python.cmd</code> fájlra. Letölt egy hordozható Pythont a <code>tools\python</code> mappába, és feltelepíti bele a szükséges csomagokat. A gépre semmit nem telepít, és a Pythonnak sem kell a gépen lennie. Ehhez az egy lépéshez internet kell.</p>
+      <p>Utána a teljes <code>BOSSME5</code> mappa hordozható: átmásolhatod másik helyre, pendrive-ra vagy másik Windowsos gépre, és ott is azonnal indul. Ha az USB MIDI illesztőhöz driver kell, azt az új gépen telepíteni kell.</p>
 
       <h2 id="inditas"><span class="num">3</span>Indítás</h2>
+      <p><strong>Legegyszerűbben:</strong> kattints duplán a <code>start-editor.cmd</code> fájlra. Elindítja a szervert, és megnyitja az editort a böngészőben. A szerver addig fut, amíg a fekete ablakot be nem zárod. Ha a szerver már fut, csak az oldalt nyitja meg.</p>
+      <p><strong>Ikonnal:</strong> futtasd egyszer a <code>create-shortcut.cmd</code> fájlt. Az asztalon és a projekt mappájában létrehoz egy „ME-5 Editor” parancsikont az ME-5 ikonjával, amely a <code>start-editor.cmd</code>-t indítja. Ha áthelyezed a mappát, futtasd újra.</p>
       <p><strong>VS Code-ból:</strong> nyisd meg a projektet (<code>start-vscode.cmd</code>), majd <em>Terminal → Run Task… → „Backend: Start FastAPI server”</em>.</p>
       <p><strong>Parancssorból:</strong></p>
 <pre><code>cd backend
-.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000</code></pre>
+..	ools\python\python.exe -m uvicorn app.main:app --port 8000</code></pre>
       <p>Utána nyisd meg a böngészőben: <a href="./"><strong>http://localhost:8000/</strong></a></p>
       <p>Ha a program a „Can't reach the backend” üzenetet írja ki, a szerver nem fut. Indítsd el, és frissítsd az oldalt.</p>
 
@@ -113,8 +115,9 @@ python -m venv .venv
         <tbody>
           <tr><td>◀ ▶ és a kijelző</td><td>Patchváltás. A kijelzőn a patch neve (pl. <code>2-3-4</code> = bank 2, csoport 3, szám 4) és a sorszáma (<code>#0</code>–<code>#63</code>) látszik.</td></tr>
           <tr><td><strong>EDIT</strong> jelzés</td><td>Pirosan világít, ha az aktuális patchet módosítottad, de még nem írtad vissza.</td></tr>
-          <tr><td><strong>Write</strong></td><td>Beírja a módosított hangzást az aktuális patchbe. Kapcsolat esetén előbb megerősítést kér, mert felülírja a patchet az ME-5-ön.</td></tr>
-          <tr><td><strong>Revert</strong></td><td>Eldobja a módosításokat, és visszaállítja a patch eredeti értékeit.</td></tr>
+          <tr><td><strong>Write</strong></td><td>Beírja a módosított hangzást az aktuális patchbe. Kapcsolat esetén előbb megerősítést kér, mert felülírja a patchet az ME-5-ön. Bekapcsolt Auto write mellett nem kérdez, azonnal ír.</td></tr>
+          <tr><td><strong>Revert</strong></td><td>Eldobja a módosításokat, és visszaállítja a patch eredeti értékeit, vagyis azt az állapotot, amelyben a patchre léptél. Ha az Auto write már beírta a módosítást, az eredetit is azonnal visszaírja.</td></tr>
+          <tr><td><strong>Auto write</strong></td><td>Bekapcsolva az utolsó változtatás után 5 másodperccel magától beírja a hangzást az aktuális patchbe, megerősítés nélkül. A Write gomb alján futó piros csík mutatja, mennyi van hátra. Patchváltáskor a függő módosítást azonnal beírja. A beállítást az editor megjegyzi.</td></tr>
           <tr><td><strong>Factory</strong></td><td>Betölti a 64 gyári patchet az editorba.</td></tr>
           <tr><td><strong>Load file…</strong> / <strong>Save file…</strong></td><td>Mind a 64 patchet <code>.syx</code> fájlba menti, vagy fájlból tölti be (részletek a <a href="#fajlok">7. pontban</a>).</td></tr>
           <tr><td><strong>Read ME-5</strong></td><td>Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható.</td></tr>
@@ -158,6 +161,7 @@ python -m venv .venv
         <li><strong>Patchváltás:</strong> azonnal Program Change üzenetet küld, és az ME-5 átvált.</li>
         <li><strong>Tekerés, kapcsolás:</strong> a módosított hangzás kb. 0,1 másodperc után átmegy az ME-5 ideiglenes memóriájába, így rögtön hallod. <strong>Ez még nem mentés.</strong> Ha patchet váltasz, a módosítás elvész, kivéve, ha előtte a <strong>Write</strong> gombra kattintasz.</li>
         <li><strong>Write:</strong> véglegesen beírja a hangzást az ME-5 aktuális patchébe.</li>
+        <li><strong>Auto write:</strong> ha bekapcsolod, nem kell a Write gombra kattintanod. Az utolsó változtatás után 5 másodperccel a hangzás magától beíródik, patchváltáskor pedig azonnal.</li>
       </ul>
 
       <h2 id="fajlok"><span class="num">7</span>Mentés fájlba és betöltés</h2>
@@ -176,7 +180,7 @@ python -m venv .venv
           <tr><td>Az Auto-detect nem találja az ME-5-öt</td><td>Ellenőrizd a MIDI IN/OUT bekötést és a MIDI csatornát. Ha a kézi portválasztással a patchváltás működik, de a SysEx nem, akkor a kábel nem viszi át a SysEx üzeneteket (lásd <a href="#kell">1. pont</a>).</td></tr>
           <tr><td>A „Read ME-5” gomb szürke</td><td>Előbb csatlakozz (<a href="#csatlakozas">4. pont</a>).</td></tr>
           <tr><td>A Read vagy a Write hibát jelez</td><td>A SysEx nem jut át. Ugyanaz az ok, mint fent.</td></tr>
-          <tr><td>A módosítás elveszett patchváltás után</td><td>Patchváltás előtt kattints a <strong>Write</strong> gombra.</td></tr>
+          <tr><td>A módosítás elveszett patchváltás után</td><td>Patchváltás előtt kattints a <strong>Write</strong> gombra, vagy kapcsold be az <strong>Auto write</strong>-ot.</td></tr>
         </tbody>
       </table></div>
       <p class="note"><strong>Manual mód:</strong> az eredeti Raspberry Pi-s változat relével kapcsolta az ME-5 manual módját. Ennek laptopon még nincs megfelelője, így ez a funkció egyelőre nem elérhető.</p>

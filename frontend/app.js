@@ -38,6 +38,8 @@ const state = {
   current: 0,
   values: null,    // the sound being edited (ME-5 temp buffer)
   conn: null,      // {output, input} when talking to a real ME-5
+  original: null,  // the patch as it was when selected - Revert returns here, even after an auto write
+  autoWrite: false,
   // Last sub-mode per pedal, so flipping CE-2 -> BF-2 -> CE-2 or RV-3 -> DD-2 -> RV-3 comes back where it was.
   mem: { flanger: 1, reverb: 0, ns: 4 },
 };
@@ -165,8 +167,8 @@ function arc(a0, a1, r = 42) {
   return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
 }
 
-const isDirty = () => state.byKey && Object.keys(state.byKey)
-  .some(k => state.values[k] !== state.library[state.current][k]);
+const differs = (a, b) => Object.keys(state.byKey).some(k => a[k] !== b[k]);
+const isDirty = () => differs(state.values, state.library[state.current]);
 
 // ---------------------------------------------------------------- state changes
 
@@ -177,17 +179,22 @@ function setValues(partial) {
   if (v.ns_threshold > 0) state.mem.ns = v.ns_threshold;
   v.rev_time = Math.min(v.rev_time, maxOf('rev_time', v));
   queueTempSend();
+  queueAutoWrite();
   refreshIndicators();
 }
 
 function selectPatch(n, { send = true } = {}) {
+  // Store a pending auto write before leaving, and only then switch the pedal over.
+  const pending = flushAutoWrite();
   state.current = (n + 64) % 64;
   state.values = { ...state.library[state.current] };
+  state.original = { ...state.values };
   setValues({}); // seed the sub-mode memory
   clearTimeout(tempTimer); // the pedal loads the patch itself on Program Change
   renderAll();
   if (send && state.conn) {
-    sendMidi([PROGRAM_CHANGE | MIDI_CHANNEL, state.current]).catch(e => toast(e.message, 'error'));
+    const program = state.current;
+    pending.then(() => sendMidi([PROGRAM_CHANGE | MIDI_CHANNEL, program])).catch(e => toast(e.message, 'error'));
   }
 }
 
@@ -197,6 +204,7 @@ function setLibrary(patches, source) {
   if (library.some(p => !p) || patches.length !== 64) {
     throw new Error(`expected 64 patches, got ${patches.length}`);
   }
+  cancelAutoWrite(); // a new library replaces the edited patch anyway
   state.library = library;
   state.source = source;
   selectPatch(state.current, { send: false });
@@ -221,6 +229,52 @@ async function sendTemp() {
 }
 
 const sendMidi = data => api('/api/send', { output: state.conn.output, data });
+
+// ---------------------------------------------------------------- auto write
+
+const AUTO_WRITE_DELAY = 5000; // keep in sync with the countdown animation in style.css
+const AUTO_WRITE_KEY = 'me5.autoWrite';
+let autoTimer = null;
+
+function queueAutoWrite() {
+  cancelAutoWrite();
+  if (!state.autoWrite || !isDirty()) return;
+  autoTimer = setTimeout(() => {
+    autoTimer = null;
+    renderAutoPending();
+    writePatch({ auto: true });
+  }, AUTO_WRITE_DELAY);
+  renderAutoPending();
+}
+
+function cancelAutoWrite() {
+  clearTimeout(autoTimer);
+  autoTimer = null;
+  renderAutoPending();
+}
+
+// Write now instead of waiting; resolves when done (at once if nothing is pending).
+function flushAutoWrite() {
+  if (autoTimer === null) return Promise.resolve();
+  cancelAutoWrite();
+  return writePatch({ auto: true });
+}
+
+function setAutoWrite(on) {
+  state.autoWrite = on;
+  try { localStorage.setItem(AUTO_WRITE_KEY, on ? '1' : '0'); } catch { /* storage blocked */ }
+  $('#auto-write').checked = on;
+  queueAutoWrite();
+}
+
+// Restarts the countdown bar on the Write button.
+function renderAutoPending() {
+  const btn = $('#store');
+  btn.classList.remove('pending');
+  if (autoTimer === null) return;
+  void btn.offsetWidth; // reflow so the animation starts over
+  btn.classList.add('pending');
+}
 
 function connect(ports) {
   state.conn = ports;
@@ -450,7 +504,7 @@ function refreshIndicators() {
   const dirty = isDirty();
   $('#edited').classList.toggle('on', dirty);
   $('#store').classList.toggle('primary', dirty);
-  $('#revert').disabled = !dirty;
+  $('#revert').disabled = !dirty && !differs(state.values, state.original);
 }
 
 function renderDisplay() {
@@ -503,26 +557,36 @@ function renderAll() {
 
 // ---------------------------------------------------------------- library actions
 
-async function writePatch() {
-  const label = patchLabel(state.current);
-  if (state.conn && !confirm(`Overwrite patch ${label} on the ME-5?`)) return;
+async function writePatch({ auto = false } = {}) {
+  // Capture now: the user may switch patch while the write is on its way.
+  const n = state.current;
+  const values = { ...state.values };
+  const label = patchLabel(n);
+  // Turning auto write on is the consent - no dialog then.
+  if (state.conn && !auto && !state.autoWrite && !confirm(`Overwrite patch ${label} on the ME-5?`)) return;
+  cancelAutoWrite();
   try {
     if (state.conn) {
-      const { data } = await api('/api/patch/encode', { values: state.values, patch_number: state.current });
+      const { data } = await api('/api/patch/encode', { values, patch_number: n });
       await sendMidi(data);
     }
-    state.library[state.current] = { ...state.values };
-    renderAll();
-    toast(state.conn ? `Written to ${label}` : `Written to ${label} (editor only - offline)`);
+    state.library[n] = values;
+    renderPatchMap();
+    refreshIndicators();
+    const where = state.conn ? label : `${label} (editor only - offline)`;
+    toast(auto ? `Auto-written to ${where}` : `Written to ${where}`);
   } catch (e) {
-    toast(`Write failed: ${e.message}`, 'error');
+    toast(`${auto ? 'Auto write' : 'Write'} failed: ${e.message}`, 'error');
   }
 }
 
 function revert() {
-  state.values = { ...state.library[state.current] };
+  cancelAutoWrite();
+  state.values = { ...state.original };
   setValues({});
   renderChain();
+  // An auto write may already have stored the edit - put the original back right away.
+  if (state.autoWrite && isDirty()) writePatch({ auto: true });
 }
 
 async function loadFactory() {
@@ -650,6 +714,7 @@ function wire() {
   $('#next').addEventListener('click', () => selectPatch(state.current + 1));
   $('#store').addEventListener('click', writePatch);
   $('#revert').addEventListener('click', revert);
+  $('#auto-write').addEventListener('change', e => setAutoWrite(e.target.checked));
   $('#lib-factory').addEventListener('click', loadFactory);
   $('#lib-load').addEventListener('click', () => openFileDialog('load'));
   $('#lib-save').addEventListener('click', () => openFileDialog('save'));
@@ -676,6 +741,8 @@ function wire() {
 
 async function init() {
   wire();
+  try { state.autoWrite = localStorage.getItem(AUTO_WRITE_KEY) === '1'; } catch { /* storage blocked */ }
+  $('#auto-write').checked = state.autoWrite;
   renderStatus();
   try {
     state.meta = await api('/api/params');

@@ -37,15 +37,15 @@ A program arjenv [Boss-ME5-MIDI-Editor](https://github.com/arjenv/Boss-ME5-MIDI-
 
 ## 2. Első telepítés
 
-Egyszer kell megcsinálni, a `backend` mappában:
+Egyszer kell megcsinálni: kattints duplán a `tools\setup-python.cmd` fájlra. Letölt egy hordozható Pythont a `tools\python` mappába, és feltelepíti bele a szükséges csomagokat. A gépre semmit nem telepít, és a Pythonnak sem kell a gépen lennie. Ehhez az egy lépéshez internet kell.
 
-```
-cd backend
-python -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
+Utána a teljes `BOSSME5` mappa hordozható: átmásolhatod másik helyre, pendrive-ra vagy másik Windowsos gépre, és ott is azonnal indul. Ha az USB MIDI illesztőhöz driver kell, azt az új gépen telepíteni kell.
 
 ## 3. Indítás
+
+**Legegyszerűbben:** kattints duplán a `start-editor.cmd` fájlra. Elindítja a szervert, és megnyitja az editort a böngészőben. A szerver addig fut, amíg a fekete ablakot be nem zárod. Ha a szerver már fut, csak az oldalt nyitja meg.
+
+**Ikonnal:** futtasd egyszer a `create-shortcut.cmd` fájlt. Az asztalon és a projekt mappájában létrehoz egy „ME-5 Editor” parancsikont az ME-5 ikonjával, amely a `start-editor.cmd`-t indítja. Ha áthelyezed a mappát, futtasd újra.
 
 **VS Code-ból:** nyisd meg a projektet (`start-vscode.cmd`), majd *Terminal → Run Task… → „Backend: Start FastAPI server”*.
 
@@ -53,7 +53,7 @@ python -m venv .venv
 
 ```
 cd backend
-.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
+..	ools\python\python.exe -m uvicorn app.main:app --port 8000
 ```
 
 Utána nyisd meg a böngészőben: **http://localhost:8000/**

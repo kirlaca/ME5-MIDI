@@ -4,7 +4,7 @@
   ],
   "settings": {
     "window.title": "ME-5 Editor${separator}${activeEditorShort}",
-    "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+    "python.defaultInterpreterPath": "${workspaceFolder}/tools/python/python.exe",
     "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
     "python.terminal.activateEnvironment": true,
     "editor.tabSize": 2,
@@ -22,7 +22,8 @@
     },
     "files.watcherExclude": {
       "**/tools/vscode/**": true,
-      "**/backend/.venv/**": true
+      "**/backend/.venv/**": true,
+      "**/tools/python/**": true
     }
   },
   "launch": {
@@ -35,7 +36,7 @@
         "module": "uvicorn",
         "args": ["app.main:app", "--reload", "--port", "8000"],
         "cwd": "${workspaceFolder}/backend",
-        "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+        "python": "${workspaceFolder}/tools/python/python.exe",
         "jinja": false,
         "justMyCode": true,
         "serverReadyAction": {
