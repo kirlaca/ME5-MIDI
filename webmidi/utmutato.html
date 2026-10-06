@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ME-5 Web MIDI – Használati utasítás</title>
+  <link rel="icon" href="me5.svg" type="image/svg+xml">
+  <link rel="icon" href="me5.ico" sizes="any">
+  <link rel="alternate" hreflang="en" href="guide.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<div class="wrap">
+  <nav class="pagenav" aria-label="Oldalak">
+    <a class="pagenav-brand" href="index.html">ME-5 Editor · Web MIDI</a>
+    <div class="pagenav-links">
+      <a href="utmutato.html" aria-current="page">Útmutató</a>
+      <a href="guide.html" hreflang="en" lang="en">English</a>
+      <a class="open" href="index.html">Editor megnyitása</a>
+    </div>
+  </nav>
+  <div class="doc">
+    <aside class="toc" aria-label="Tartalom">
+      <span class="label">Tartalom</span>
+      <ol>
+        <li class="plain"><a href="#mi">Mi ez?</a></li>
+        <li value="1"><a href="#kell">Amire szükség van</a></li>
+        <li class="plain"><a href="#bekotes">Bekötés a pedálhoz</a></li>
+        <li value="2"><a href="#inditas">Indítás</a></li>
+        <li value="3"><a href="#csatlakozas">Csatlakozás</a></li>
+        <li value="4"><a href="#kepernyo">A képernyő részei</a></li>
+        <li value="5"><a href="#kezeles">Kezelés</a></li>
+        <li value="6"><a href="#fajlok">Mentés és betöltés</a></li>
+        <li value="7"><a href="#javitas">Hibás patchek javítása</a></li>
+        <li value="8"><a href="#hibak">Gyakori problémák</a></li>
+      </ol>
+    </aside>
+
+    <article class="prose">
+      <header class="stack">
+        <span class="label">ME-5 Editor · Web MIDI</span>
+        <h1>Használati utasítás</h1>
+        <p class="lede">A BOSS ME-5 gitár-multieffekt szerkesztője, amely teljesen a böngészőben fut. Egy virtuális pedalboard jelenik meg, a pedálok ugyanabban a sorrendben állnak, mint a jel útja az ME-5-ben. A böngésző USB-MIDI interfészen keresztül közvetlenül beszél a pedállal, nem kell hozzá se Python, se szerver.</p>
+      </header>
+
+      <h2 id="mi">Mi ez?</h2>
+      <p>Az ME-5-nek van MIDI csatlakozója, és MIDI-n keresztül minden beállítása elérhető. Ez a program ezt használja ki: <strong>egy felületen látszik az egész patch</strong>, minden gomb egérrel vagy ujjal állítható, és a változás azonnal hallható. A patchek elmenthetők, visszatölthetők, és a gyári hangzások is bármikor elérhetők.</p>
+      <p>Ez a <strong>Web MIDI változat</strong>: ugyanazt tudja, mint a Pythonos editor, de a böngésző beépített MIDI-elérését (Web MIDI API) használja. Ezért bármelyik gépen vagy Android telefonon elindul, amelyen van Chrome vagy Edge, telepítés nélkül.</p>
+
+      <h2 id="kell"><span class="num">1</span>Amire szükség van</h2>
+      <ul>
+        <li><strong>Böngésző:</strong> Chrome vagy Edge, Windowson, macOS-en, Linuxon vagy Androidon. <strong>Safari és iPhone/iPad nem jó</strong>, mert nem támogatják a Web MIDI-t.</li>
+        <li><strong>USB-MIDI interfész.</strong> Optocsatolós, jó minőségű interfész kell (pl. Roland UM-ONE mkII vagy DOREMiDi). Az olcsó „USB2.0-MIDI” kábeleken a patchváltás átmegy, a SysEx (patch olvasás és írás) viszont nem.</li>
+        <li>Androidon egy <strong>USB OTG adapter</strong> is kell, hogy az interfész a telefonba dugható legyen.</li>
+      </ul>
+
+      <h3 id="bekotes">Hogyan kapcsolódik a gép a pedálhoz?</h3>
+      <div class="wiring" role="img" aria-label="Gép vagy telefon, USB, USB-MIDI interfész, két DIN dugó, ME-5 hátlap">
+        <span class="node">Gép / telefon</span><span class="wire">USB</span>
+        <span class="node">USB-MIDI interfész</span><span class="wire">2 × DIN</span>
+        <span class="node me5">ME-5 hátlap</span>
+      </div>
+      <div class="cross">
+        <div><span class="jackname">interfész OUT</span><span class="arrow">→</span><span class="jackname me5">ME-5 MIDI IN</span></div>
+        <div><span class="jackname">interfész IN</span><span class="arrow">←</span><span class="jackname me5">ME-5 MIDI OUT</span></div>
+      </div>
+      <ol>
+        <li><strong>Kapcsold ki az ME-5-öt</strong>, mielőtt a MIDI kábelt bedugod. Nem kötelező, de így biztonságosabb.</li>
+        <li>Az interfész két DIN dugóját <strong>keresztbe</strong> kell bedugni:
+          <ul>
+            <li>az interfész <strong>OUT</strong> jelű dugója → az ME-5 <strong>MIDI IN</strong> aljzatába;</li>
+            <li>az interfész <strong>IN</strong> jelű dugója → az ME-5 <strong>MIDI OUT</strong> aljzatába.</li>
+          </ul>
+          Egyes kábeleken fordítva van a felirat, és azt jelöli, hová kell dugni. Ha a patchváltás nem megy, cseréld fel a két dugót.</li>
+        <li>Dugd az interfészt a gépbe vagy a telefonba.</li>
+        <li>Kapcsold be az ME-5-öt, és tedd <strong>Play módba</strong>. Edit módban a pedál nem fogad SysEx-et, így az editor nem tudja sem beolvasni, sem állítani a hangokat, csak a patchváltás működik. A MIDI csatorna bármelyik lehet (1–16), az Auto-detect megkeresi.</li>
+      </ol>
+
+      <h2 id="inditas"><span class="num">2</span>Indítás</h2>
+      <p>Az editor egyetlen weboldal, a <code>webmidi</code> mappában lévő <code>index.html</code>. Háromféleképpen nyithatod meg:</p>
+      <ul>
+        <li><strong>Webcímről (HTTPS):</strong> ha az oldal fel van téve egy webtárhelyre (pl. GitHub Pages), egyszerűen nyisd meg a címét. Ez a legkényelmesebb, és telefonon is így működik.</li>
+        <li><strong>Közvetlenül fájlból:</strong> kattints duplán az <code>index.html</code>-re. Ha a böngésző így nem kér MIDI engedélyt, használd a következő módot.</li>
+        <li><strong>Helyi szerverről:</strong> a projekt mappájában futtasd az <code>npx serve webmidi</code> vagy a <code>python -m http.server -d webmidi</code> parancsot, és nyisd meg a kiírt <code>http://localhost:…</code> címet.</li>
+      </ul>
+      <p class="note"><strong>Fontos:</strong> a Pythonos editor szervere ne fusson közben. Windowson egy MIDI portot egyszerre csak egy program használhat, így a két editor elvenné egymás elől a portot.</p>
+
+      <h2 id="csatlakozas"><span class="num">3</span>Csatlakozás az ME-5-höz</h2>
+      <ol>
+        <li>Kattints a jobb felső sarokban az <strong>Offline</strong> feliratra.</li>
+        <li>A böngésző első alkalommal <strong>engedélyt kér a MIDI eszközök (és a SysEx) használatához</strong>. Kattints az <strong>Engedélyezés</strong> gombra. Ha véletlenül letiltottad, a címsor bal oldalán lévő ikonra kattintva, a webhely-beállításoknál engedélyezheted újra.</li>
+        <li>Válassz egyet:
+          <ul>
+            <li><strong>Auto-detect</strong>: minden porton és MIDI csatornán megkeresi az ME-5-öt, és magától csatlakozik. Ehhez működő SysEx kell.</li>
+            <li>Kézzel: válaszd ki az <strong>Output (to ME-5)</strong> és az <strong>Input (from ME-5)</strong> portot, az <strong>ME-5 MIDI channel</strong> mezőben az ME-5 csatornáját, majd kattints a <strong>Use these ports</strong> gombra. A patchváltás így akkor is működik, ha a SysEx nem.</li>
+          </ul>
+        </li>
+        <li>Csatlakozás után a felirat zöldre vált, és a kimeneti port neve és a MIDI csatorna látszik rajta.</li>
+        <li>A <strong>Go offline</strong> gomb bontja a kapcsolatot.</li>
+      </ol>
+      <p>Az editor megjegyzi a legutóbb használt portokat. Az oldal újratöltésekor magától visszacsatlakozik, ha az interfész be van dugva. Ha menet közben kihúzod az interfészt, offline módba vált.</p>
+      <p>Offline módban minden szerkesztés csak az editorban történik, az ME-5-re nem jut el semmi.</p>
+      <p class="note"><strong>Próba:</strong> csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Ezután a <strong>Read ME-5</strong> gombbal ellenőrizheted, hogy a SysEx is átmegy-e: ha sikerül, a program kiolvassa mind a 64 patchet.</p>
+
+      <h2 id="kepernyo"><span class="num">4</span>A képernyő részei</h2>
+      <h3>Felső sáv</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Elem</th><th>Mit csinál</th></tr></thead>
+        <tbody>
+          <tr><td>◀ ▶ és a kijelző</td><td>Patchváltás. A kijelzőn a patch neve (pl. <code>2-3-4</code> = 2. csoport, 3. bank, 4. patch, mint a pedálon) és a sorszáma (<code>#01</code>–<code>#64</code>) látszik.</td></tr>
+          <tr><td><strong>EDIT</strong> jelzés</td><td>Világít, ha az aktuális patchet módosítottad, de még nem írtad vissza.</td></tr>
+          <tr><td><strong>Write</strong></td><td>Beírja a módosított hangzást az aktuális patchbe. Kapcsolat esetén előbb megerősítést kér, mert felülírja a patchet az ME-5-ön. Bekapcsolt Auto write mellett nem kérdez.</td></tr>
+          <tr><td><strong>Revert</strong></td><td>Eldobja a módosításokat, és visszaállítja azt az állapotot, amelyben a patchre léptél. Ha az Auto write már beírta a módosítást, az eredetit is azonnal visszaírja.</td></tr>
+          <tr><td><strong>Auto write</strong></td><td>Bekapcsolva az utolsó változtatás után 5 másodperccel magától beírja a hangzást az aktuális patchbe, megerősítés nélkül. A Write gomb alján futó csík mutatja, mennyi van hátra. Patchváltáskor a függő módosítást azonnal beírja. A beállítást az editor megjegyzi.</td></tr>
+          <tr><td><strong>Factory</strong></td><td>Betölti a 64 gyári patchet az editorba (az ME-5-re ettől nem kerülnek át).</td></tr>
+          <tr><td><strong>Load file…</strong> / <strong>Save file…</strong></td><td>Mind a 64 patchet <code>.syx</code> fájlból tölti be, vagy fájlba menti (részletek a <a href="#fajlok">6. pontban</a>).</td></tr>
+          <tr><td><strong>Read ME-5</strong></td><td>Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható.</td></tr>
+          <tr><td><strong>Repair N</strong></td><td>Csak akkor látszik, ha a beolvasásnál hibás patchek voltak. Lásd a <a href="#javitas">7. pontot</a>.</td></tr>
+        </tbody>
+      </table></div>
+      <p>A gombsor jobb szélén lévő felirat mutatja, honnan származnak az éppen betöltött patchek (gyári, fájl vagy ME-5).</p>
+
+      <h3>Patches (patchtérkép)</h3>
+      <p>A 64 patch rácsban látszik. A cellákban lévő színes pöttyök mutatják, melyik effekt van bekapcsolva az adott patchben, a pötty színe a pedál színe. Egy cellára kattintva azonnal arra a patchre váltasz. A szaggatott, borostyánszínű keretes cellák hibás patchet jelölnek. A <strong>Patches</strong> feliratra kattintva a térkép becsukható.</p>
+
+      <h3>A pedalboard</h3>
+      <p>Balról jobbra, a jel útja szerint (INPUT → OUTPUT):</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Pedál</th><th>Mit utánoz</th><th>Állítható</th></tr></thead>
+        <tbody>
+          <tr><td><span class="chip" style="--c:#2f7fc1">1</span></td><td>Kompresszor</td><td>CS-2</td><td>Level, Tone, Attack, Sustain</td></tr>
+          <tr><td><span class="chip" style="--c:#f39a1e">2</span></td><td>Overdrive / Distortion</td><td>OD-2, OD-2 Turbo, DS-1 (a <em>Type</em> kapcsolóval)</td><td>Level, Drive</td></tr>
+          <tr><td><span class="chip" style="--c:#c9cdd2">3</span></td><td>Equalizer</td><td>GE-7</td><td>Low, Mid, High, Level tolópotméterek; <em>Mid freq</em>: 0.5k / 1k / 2k</td></tr>
+          <tr><td><span class="chip" style="--c:#8fd0e8">4</span></td><td>Chorus / Flanger</td><td>CE-2 vagy BF-2 (<em>Type</em>); a BF-2-nél <em>Mode</em> 1–4</td><td>Rate, Depth, Res, Level</td></tr>
+          <tr><td>–</td><td>Send / Return</td><td>az effektloop</td><td>OFF / ON</td></tr>
+          <tr><td><span class="chip" style="--c:#ecebe4">NS</span></td><td>Zajzár</td><td>NS-2</td><td>Threshold</td></tr>
+          <tr><td><span class="chip" style="--c:#27406f;--ink:#fff">B</span></td><td>Reverb / Delay</td><td>RV-2 (<em>Mode</em>: Room, Hall 15, Hall 30, Plate, Gated) vagy DD-2 (<em>Type</em>)</td><td>Time, F.B., Tone, Level</td></tr>
+          <tr><td>–</td><td>Master level</td><td>a kimeneti hangerő</td><td>Level (az 5.0 érték nem változtat a hangerőn)</td></tr>
+        </tbody>
+      </table></div>
+      <p>A pedál kinézete a kiválasztott típushoz igazodik, például DS-1 módban narancssárga lesz.</p>
+
+      <h2 id="kezeles"><span class="num">5</span>Kezelés</h2>
+      <p><strong>Pedál ki- és bekapcsolása:</strong> kattints a pedál taposójára (a nagy, számozott részre). A bekapcsolt pedálnál világít a <strong>CHECK</strong> LED. Az NS pedál kikapcsolt állapota a 0-s Threshold érték; visszakapcsoláskor az utoljára használt érték tér vissza.</p>
+      <p><strong>Forgatógombok:</strong></p>
+      <ul>
+        <li>egérrel vagy ujjal fel- vagy lefelé húzva;</li>
+        <li>egérgörgővel, görgetésenként egy lépés;</li>
+        <li>billentyűzettel, ha a gomb ki van jelölve: <kbd>↑</kbd>/<kbd>→</kbd> és <kbd>↓</kbd>/<kbd>←</kbd> egy lépés, <kbd>PgUp</kbd>/<kbd>PgDn</kbd> nagyobb lépés, <kbd>Home</kbd> a minimum, <kbd>End</kbd> a maximum.</li>
+      </ul>
+      <p><strong>GE-7 tolópotméterek:</strong> húzással vagy egérgörgővel állíthatók.</p>
+      <p><strong>Patchváltás billentyűzettel:</strong> a <kbd>←</kbd> és <kbd>→</kbd> nyíl vált az előző, illetve a következő patchre, ha éppen nincs kijelölve gomb vagy beviteli mező.</p>
+
+      <h3>Mi jut el az ME-5-re, és mikor?</h3>
+      <ul>
+        <li><strong>Patchváltás:</strong> azonnal Program Change üzenetet küld, és az ME-5 átvált.</li>
+        <li><strong>Tekerés, kapcsolás:</strong> a módosított hangzás kb. 0,1 másodperc után átmegy az ME-5 ideiglenes memóriájába, így rögtön hallod. <strong>Ez még nem mentés.</strong> Ha patchet váltasz, a módosítás elvész, kivéve, ha előtte a <strong>Write</strong> gombra kattintasz.</li>
+        <li><strong>Write:</strong> véglegesen beírja a hangzást az ME-5 aktuális patchébe.</li>
+        <li><strong>Auto write:</strong> ha bekapcsolod, nem kell a Write gombra kattintanod. Az utolsó változtatás után 5 másodperccel a hangzás magától beíródik, patchváltáskor pedig azonnal.</li>
+      </ul>
+
+      <h2 id="fajlok"><span class="num">6</span>Mentés fájlba és betöltés</h2>
+      <p>A Web MIDI változatnak nincs saját fájlmappája: a fájlok oda kerülnek, ahová a böngésző letölt, és onnan töltöd be őket, ahonnan szeretnéd. A fájlformátum ugyanaz a <code>.syx</code> dump, mint a Pythonos editorban és az eredeti programban, így a fájlok átvihetők közöttük.</p>
+      <ul>
+        <li><strong>Save file…:</strong> add meg a nevet (a <code>.syx</code> végződést a program magától hozzáteszi), és kattints a <strong>Save</strong> gombra. A böngésző letölti a fájlt, általában a <em>Letöltések</em> mappába. A fájlba az editorban lévő 64 patch kerül. <strong>A még be nem írt (EDIT állapotú) módosítások nem kerülnek bele</strong>, ezért előtte kattints a <strong>Write</strong> gombra.</li>
+        <li><strong>Load file…:</strong> megnyílik a fájlválasztó, válaszd ki a <code>.syx</code> fájlt. A fájlt az editor ablakára húzva is betöltheted. Betöltés után az editorban a fájl patchei lesznek; az ME-5-re ettől még nem kerülnek át, ahhoz patchenként a <strong>Write</strong> gomb kell.</li>
+      </ul>
+
+      <h2 id="javitas"><span class="num">7</span>Hibás patchek javítása</h2>
+      <p>Ha az ME-5 memóriájában egy patch helyén értelmetlen adat van (ez régi pedálokon a lemerült háttérelem miatt fordulhat elő), a <strong>Read ME-5</strong> ettől még beolvassa a többit. A hibás patchek helyére az editor a gyári hangzást teszi, a patchtérképen pedig szaggatott, borostyánszínű kerettel jelöli őket.</p>
+      <p>Ilyenkor megjelenik a <strong>Repair N</strong> gomb (N a hibás patchek száma). Megerősítés után a gomb mindegyik hibás patch helyére beírja a gyári hangzást az ME-5-ön.</p>
+      <p class="note">Ha a kijavított patchek a pedál kikapcsolása után újra elromlanak, valószínűleg az ME-5 háttérelemét kell cserélni.</p>
+
+      <h2 id="hibak"><span class="num">8</span>Gyakori problémák</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Tünet</th><th>Megoldás</th></tr></thead>
+        <tbody>
+          <tr><td>„This browser has no Web MIDI”</td><td>A böngésző nem támogatja a Web MIDI-t (pl. Safari, iPhone). Használj Chrome-ot vagy Edge-et.</td></tr>
+          <tr><td>„MIDI access denied”</td><td>Letiltottad a MIDI engedélyt. A címsor bal oldalán lévő ikonra kattintva, a webhely-beállításoknál engedélyezd a MIDI eszközöket, majd töltsd újra az oldalt. Ha fájlból nyitottad meg és nem jön elő az engedélykérés, indítsd helyi szerverről (<a href="#inditas">2. pont</a>).</td></tr>
+          <tr><td>„No MIDI ports found”</td><td>Az interfész nincs bedugva, vagy a rendszer nem ismerte fel. Dugd be, és nyisd meg újra a csatlakozás ablakot.</td></tr>
+          <tr><td>„could not open any MIDI input”</td><td>Egy másik program (pl. a Pythonos editor szervere vagy egy DAW) foglalja a portot. Zárd be, és próbáld újra.</td></tr>
+          <tr><td>„ME-5 not found on any MIDI port”</td><td>Ellenőrizd, hogy az ME-5 Play módban van, és hogy a MIDI IN/OUT keresztbe van bekötve. Ha kézi portválasztással a patchváltás működik, de a SysEx nem, akkor az interfész nem viszi át a SysEx üzeneteket (lásd <a href="#kell">1. pont</a>).</td></tr>
+          <tr><td>Az editor beállításai nem hallatszanak, a Read ME-5 nem működik, de a patchváltás igen</td><td>Az ME-5 valószínűleg Edit módban van. Állítsd Play módba.</td></tr>
+          <tr><td>A „Read ME-5” gomb szürke</td><td>Előbb csatlakozz (<a href="#csatlakozas">3. pont</a>).</td></tr>
+          <tr><td>A módosítás elveszett patchváltás után</td><td>Patchváltás előtt kattints a <strong>Write</strong> gombra, vagy kapcsold be az <strong>Auto write</strong>-ot.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note"><strong>Manual mód:</strong> az eredeti Raspberry Pi-s változat relével kapcsolta az ME-5 manual módját. Erre nincs MIDI parancs, így ez a funkció itt nem érhető el.</p>
+    </article>
+  </div>
+
+  <footer>
+    <p>Rajongói projekt, a BOSS / Roland Corporationnel nincs kapcsolatban. A BOSS és az ME-5 a Roland Corporation védjegyei. Forráskód: <a href="https://github.com/kirlaca/ME5-MIDI">github.com/kirlaca/ME5-MIDI</a></p>
+  </footer>
+</div>
+</body>
+</html>

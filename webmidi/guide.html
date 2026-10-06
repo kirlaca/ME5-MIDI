@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ME-5 Web MIDI – User guide</title>
+  <link rel="icon" href="me5.svg" type="image/svg+xml">
+  <link rel="icon" href="me5.ico" sizes="any">
+  <link rel="alternate" hreflang="hu" href="utmutato.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<div class="wrap">
+  <nav class="pagenav" aria-label="Pages">
+    <a class="pagenav-brand" href="index.html">ME-5 Editor · Web MIDI</a>
+    <div class="pagenav-links">
+      <a href="guide.html" aria-current="page">Guide</a>
+      <a href="utmutato.html" hreflang="hu" lang="hu">Magyar</a>
+      <a class="open" href="index.html">Open the editor</a>
+    </div>
+  </nav>
+  <div class="doc">
+    <aside class="toc" aria-label="Contents">
+      <span class="label">Contents</span>
+      <ol>
+        <li class="plain"><a href="#what">What is this?</a></li>
+        <li value="1"><a href="#need">What you need</a></li>
+        <li class="plain"><a href="#wiring">Wiring</a></li>
+        <li value="2"><a href="#start">Starting</a></li>
+        <li value="3"><a href="#connect">Connecting</a></li>
+        <li value="4"><a href="#screen">The screen</a></li>
+        <li value="5"><a href="#use">Using the editor</a></li>
+        <li value="6"><a href="#files">Saving and loading</a></li>
+        <li value="7"><a href="#repair">Repairing bad patches</a></li>
+        <li value="8"><a href="#trouble">Troubleshooting</a></li>
+      </ol>
+    </aside>
+
+    <article class="prose">
+      <header class="stack">
+        <span class="label">ME-5 Editor · Web MIDI</span>
+        <h1>User guide</h1>
+        <p class="lede">An editor for the BOSS ME-5 guitar multi-effects that runs entirely in the browser. It shows a virtual pedalboard with the pedals in the same order as the signal path inside the ME-5. The browser talks to the pedal directly through a USB-MIDI interface, so there is no Python and no server to run.</p>
+      </header>
+
+      <h2 id="what">What is this?</h2>
+      <p>The ME-5 has MIDI ports, and every setting can be reached over MIDI. This editor uses that: <strong>the whole patch is on one screen</strong>, every control can be set with the mouse or a finger, and you hear the change at once. Patches can be saved, loaded back, and the factory sounds are always one click away.</p>
+      <p>This is the <strong>Web MIDI version</strong>. It does the same as the Python editor, but uses the browser's built-in MIDI access (the Web MIDI API). It therefore runs without installing anything on any computer or Android phone that has Chrome or Edge.</p>
+
+      <h2 id="need"><span class="num">1</span>What you need</h2>
+      <ul>
+        <li><strong>Browser:</strong> Chrome or Edge on Windows, macOS, Linux or Android. <strong>Safari and iPhone/iPad will not work</strong>: they do not support Web MIDI.</li>
+        <li><strong>A USB-MIDI interface.</strong> Use a good, opto-isolated one (e.g. Roland UM-ONE mkII or DOREMiDi). Cheap "USB2.0-MIDI" cables pass patch changes but not SysEx, so reading and writing patches fails.</li>
+        <li>On Android you also need a <strong>USB OTG adapter</strong> to plug the interface into the phone.</li>
+      </ul>
+
+      <h3 id="wiring">How does the computer connect to the pedal?</h3>
+      <div class="wiring" role="img" aria-label="Computer or phone, USB, USB-MIDI interface, two DIN plugs, ME-5 rear panel">
+        <span class="node">Computer / phone</span><span class="wire">USB</span>
+        <span class="node">USB-MIDI interface</span><span class="wire">2 × DIN</span>
+        <span class="node me5">ME-5 rear panel</span>
+      </div>
+      <div class="cross">
+        <div><span class="jackname">interface OUT</span><span class="arrow">→</span><span class="jackname me5">ME-5 MIDI IN</span></div>
+        <div><span class="jackname">interface IN</span><span class="arrow">←</span><span class="jackname me5">ME-5 MIDI OUT</span></div>
+      </div>
+      <ol>
+        <li><strong>Switch the ME-5 off</strong> before plugging in the MIDI cable. Not required, but safer.</li>
+        <li>Plug the interface's two DIN plugs in <strong>crosswise</strong>:
+          <ul>
+            <li>the interface plug marked <strong>OUT</strong> → the ME-5's <strong>MIDI IN</strong> socket;</li>
+            <li>the interface plug marked <strong>IN</strong> → the ME-5's <strong>MIDI OUT</strong> socket.</li>
+          </ul>
+          Some cables are labelled the other way round, naming the socket the plug goes into. If patch changes don't work, swap the two plugs.</li>
+        <li>Plug the interface into the computer or phone.</li>
+        <li>Switch the ME-5 on and put it in <strong>Play mode</strong>. In Edit mode the pedal ignores SysEx, so the editor can neither read nor set sounds; only patch changes work. Any MIDI channel (1–16) is fine: Auto-detect finds it.</li>
+      </ol>
+
+      <h2 id="start"><span class="num">2</span>Starting</h2>
+      <p>The editor is a single web page, <code>index.html</code> in the <code>webmidi</code> folder. There are three ways to open it:</p>
+      <ul>
+        <li><strong>From a web address (HTTPS):</strong> if the page is hosted somewhere (e.g. GitHub Pages), just open its address. This is the easiest way, and the way it works on a phone.</li>
+        <li><strong>Straight from the file:</strong> double-click <code>index.html</code>. If the browser doesn't ask for MIDI permission this way, use the next option.</li>
+        <li><strong>From a local server:</strong> in the project folder run <code>npx serve webmidi</code> or <code>python -m http.server -d webmidi</code>, then open the <code>http://localhost:…</code> address it prints.</li>
+      </ul>
+      <p class="note"><strong>Important:</strong> don't run the Python editor's server at the same time. On Windows only one program can hold a MIDI port open, so the two editors would take the port from each other.</p>
+
+      <h2 id="connect"><span class="num">3</span>Connecting to the ME-5</h2>
+      <ol>
+        <li>Click <strong>Offline</strong> in the top right corner.</li>
+        <li>The first time, the browser <strong>asks for permission to use MIDI devices (and SysEx)</strong>. Click <strong>Allow</strong>. If you blocked it by mistake, click the icon at the left of the address bar and allow MIDI devices in the site settings.</li>
+        <li>Then either:
+          <ul>
+            <li><strong>Auto-detect</strong>: searches every port and MIDI channel for the ME-5 and connects by itself. This needs working SysEx.</li>
+            <li>By hand: pick the <strong>Output (to ME-5)</strong> and <strong>Input (from ME-5)</strong> ports, set <strong>ME-5 MIDI channel</strong> to the pedal's channel, and click <strong>Use these ports</strong>. Patch changes work this way even when SysEx doesn't.</li>
+          </ul>
+        </li>
+        <li>Once connected, the label turns green and shows the output port name and the MIDI channel.</li>
+        <li><strong>Go offline</strong> disconnects.</li>
+      </ol>
+      <p>The editor remembers the ports you used last. When you reload the page it reconnects by itself if the interface is plugged in. If you unplug the interface while working, it switches to offline.</p>
+      <p>When offline, all edits stay in the editor; nothing reaches the ME-5.</p>
+      <p class="note"><strong>Quick test:</strong> after connecting, change patch with ◀ ▶. If the number on the ME-5's display changes too, the connection works. Then press <strong>Read ME-5</strong> to check SysEx: if it succeeds, all 64 patches are read from the pedal.</p>
+
+      <h2 id="screen"><span class="num">4</span>The screen</h2>
+      <h3>Top bar</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Control</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>◀ ▶ and the display</td><td>Changes patch. The display shows the patch name (e.g. <code>2-3-4</code> = group 2, bank 3, patch 4, as on the pedal) and its number (<code>#01</code>–<code>#64</code>).</td></tr>
+          <tr><td><strong>EDIT</strong> indicator</td><td>Lights up when the current patch has been changed but not written yet.</td></tr>
+          <tr><td><strong>Write</strong></td><td>Writes the edited sound into the current patch. When connected it asks first, because it overwrites the patch on the ME-5. With Auto write on it doesn't ask.</td></tr>
+          <tr><td><strong>Revert</strong></td><td>Throws away your edits and goes back to the patch as it was when you selected it. If Auto write has already stored the edit, it writes the original back right away.</td></tr>
+          <tr><td><strong>Auto write</strong></td><td>When on, the sound is written into the current patch 5 seconds after your last change, without asking. A bar along the bottom of the Write button shows the countdown. A pending write is stored at once when you change patch. The setting is remembered.</td></tr>
+          <tr><td><strong>Factory</strong></td><td>Loads the 64 factory patches into the editor (this does not send them to the ME-5).</td></tr>
+          <tr><td><strong>Load file…</strong> / <strong>Save file…</strong></td><td>Loads all 64 patches from a <code>.syx</code> file, or saves them to one (see <a href="#files">section 6</a>).</td></tr>
+          <tr><td><strong>Read ME-5</strong></td><td>Reads all 64 patches from the ME-5. Only available when connected.</td></tr>
+          <tr><td><strong>Repair N</strong></td><td>Only shown when a read found bad patches. See <a href="#repair">section 7</a>.</td></tr>
+        </tbody>
+      </table></div>
+      <p>The label at the right end of the button row shows where the loaded patches came from (factory, file or ME-5).</p>
+
+      <h3>Patches (patch map)</h3>
+      <p>All 64 patches are shown in a grid. The coloured dots in each cell show which effects are on in that patch, in the colour of the pedal. Click a cell to switch to that patch. Cells with a dashed amber border are bad patches. Click the <strong>Patches</strong> heading to fold the map away.</p>
+
+      <h3>The pedalboard</h3>
+      <p>Left to right, following the signal (INPUT → OUTPUT):</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Pedal</th><th>Modelled on</th><th>Controls</th></tr></thead>
+        <tbody>
+          <tr><td><span class="chip" style="--c:#2f7fc1">1</span></td><td>Compressor</td><td>CS-2</td><td>Level, Tone, Attack, Sustain</td></tr>
+          <tr><td><span class="chip" style="--c:#f39a1e">2</span></td><td>Overdrive / Distortion</td><td>OD-2, OD-2 Turbo, DS-1 (with the <em>Type</em> switch)</td><td>Level, Drive</td></tr>
+          <tr><td><span class="chip" style="--c:#c9cdd2">3</span></td><td>Equalizer</td><td>GE-7</td><td>Low, Mid, High, Level faders; <em>Mid freq</em>: 0.5k / 1k / 2k</td></tr>
+          <tr><td><span class="chip" style="--c:#8fd0e8">4</span></td><td>Chorus / Flanger</td><td>CE-2 or BF-2 (<em>Type</em>); BF-2 has <em>Mode</em> 1–4</td><td>Rate, Depth, Res, Level</td></tr>
+          <tr><td>–</td><td>Send / Return</td><td>the effects loop</td><td>OFF / ON</td></tr>
+          <tr><td><span class="chip" style="--c:#ecebe4">NS</span></td><td>Noise suppressor</td><td>NS-2</td><td>Threshold</td></tr>
+          <tr><td><span class="chip" style="--c:#27406f;--ink:#fff">B</span></td><td>Reverb / Delay</td><td>RV-2 (<em>Mode</em>: Room, Hall 15, Hall 30, Plate, Gated) or DD-2 (<em>Type</em>)</td><td>Time, F.B., Tone, Level</td></tr>
+          <tr><td>–</td><td>Master level</td><td>the output volume</td><td>Level (5.0 leaves the volume unchanged)</td></tr>
+        </tbody>
+      </table></div>
+      <p>Each pedal's look follows the selected type; in DS-1 mode, for example, it turns orange.</p>
+
+      <h2 id="use"><span class="num">5</span>Using the editor</h2>
+      <p><strong>Turning a pedal on and off:</strong> click its footswitch (the large numbered part). The <strong>CHECK</strong> LED lights when the pedal is on. The NS pedal is "off" at Threshold 0; switching it back on restores the last threshold used.</p>
+      <p><strong>Knobs:</strong></p>
+      <ul>
+        <li>drag up or down with the mouse or a finger;</li>
+        <li>mouse wheel, one step per notch;</li>
+        <li>keyboard, when the knob has focus: <kbd>↑</kbd>/<kbd>→</kbd> and <kbd>↓</kbd>/<kbd>←</kbd> one step, <kbd>PgUp</kbd>/<kbd>PgDn</kbd> bigger steps, <kbd>Home</kbd> minimum, <kbd>End</kbd> maximum.</li>
+      </ul>
+      <p><strong>GE-7 faders:</strong> drag them or use the mouse wheel.</p>
+      <p><strong>Changing patch from the keyboard:</strong> <kbd>←</kbd> and <kbd>→</kbd> go to the previous and next patch when no control or input field has focus.</p>
+
+      <h3>What reaches the ME-5, and when?</h3>
+      <ul>
+        <li><strong>Patch change:</strong> a Program Change is sent at once and the ME-5 switches.</li>
+        <li><strong>Turning a knob, flipping a switch:</strong> about 0.1 s later the edited sound is sent to the ME-5's temporary memory, so you hear it right away. <strong>This is not saved yet.</strong> If you change patch, the edit is lost unless you press <strong>Write</strong> first.</li>
+        <li><strong>Write:</strong> stores the sound in the current patch on the ME-5 for good.</li>
+        <li><strong>Auto write:</strong> when on, you don't need to press Write. The sound is stored 5 seconds after your last change, or at once when you change patch.</li>
+      </ul>
+
+      <h2 id="files"><span class="num">6</span>Saving to a file and loading</h2>
+      <p>The Web MIDI version has no file folder of its own: files go wherever the browser saves downloads, and you load them from wherever you like. The format is the same <code>.syx</code> dump as in the Python editor and the original program, so files can be moved between them.</p>
+      <ul>
+        <li><strong>Save file…:</strong> type a name (the <code>.syx</code> extension is added for you) and click <strong>Save</strong>. The browser downloads the file, usually into the <em>Downloads</em> folder. The file holds the 64 patches in the editor. <strong>Unwritten edits (EDIT lit) are not included</strong>, so press <strong>Write</strong> first.</li>
+        <li><strong>Load file…:</strong> a file picker opens; choose the <code>.syx</code> file. You can also drag the file onto the editor window. After loading, the editor holds the file's patches; they are not sent to the ME-5 until you <strong>Write</strong> them patch by patch.</li>
+      </ul>
+
+      <h2 id="repair"><span class="num">7</span>Repairing bad patches</h2>
+      <p>If a patch slot in the ME-5's memory holds garbage (old pedals can get this from a flat backup battery), <strong>Read ME-5</strong> still reads the rest. The editor puts the factory sound in place of each bad patch and marks it with a dashed amber border in the patch map.</p>
+      <p>The <strong>Repair N</strong> button then appears (N is the number of bad patches). After you confirm, it writes the factory sound into every bad slot on the ME-5.</p>
+      <p class="note">If repaired patches go bad again after the pedal has been switched off, the ME-5's backup battery probably needs replacing.</p>
+
+      <h2 id="trouble"><span class="num">8</span>Troubleshooting</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>"This browser has no Web MIDI"</td><td>The browser doesn't support Web MIDI (e.g. Safari, iPhone). Use Chrome or Edge.</td></tr>
+          <tr><td>"MIDI access denied"</td><td>MIDI permission was blocked. Click the icon at the left of the address bar, allow MIDI devices in the site settings, then reload. If you opened the file directly and no permission prompt appears, start it from a local server (<a href="#start">section 2</a>).</td></tr>
+          <tr><td>"No MIDI ports found"</td><td>The interface isn't plugged in or wasn't recognised. Plug it in and open the connection dialog again.</td></tr>
+          <tr><td>"could not open any MIDI input"</td><td>Another program (e.g. the Python editor's server or a DAW) holds the port. Close it and try again.</td></tr>
+          <tr><td>"ME-5 not found on any MIDI port"</td><td>Check that the ME-5 is in Play mode and that MIDI IN/OUT are wired crosswise. If patch changes work with ports picked by hand but SysEx doesn't, the interface doesn't pass SysEx (see <a href="#need">section 1</a>).</td></tr>
+          <tr><td>Editor changes can't be heard and Read ME-5 fails, but patch changes work</td><td>The ME-5 is probably in Edit mode. Switch it to Play mode.</td></tr>
+          <tr><td>"Read ME-5" is greyed out</td><td>Connect first (<a href="#connect">section 3</a>).</td></tr>
+          <tr><td>An edit was lost after changing patch</td><td>Press <strong>Write</strong> before changing patch, or turn on <strong>Auto write</strong>.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note"><strong>Manual mode:</strong> the original Raspberry Pi version switched the ME-5's manual mode with a relay. There is no MIDI command for it, so this feature is not available here.</p>
+    </article>
+  </div>
+
+  <footer>
+    <p>A fan project, not affiliated with BOSS / Roland Corporation. BOSS and ME-5 are trademarks of Roland Corporation. Source code: <a href="https://github.com/kirlaca/ME5-MIDI">github.com/kirlaca/ME5-MIDI</a></p>
+  </footer>
+</div>
+</body>
+</html>

@@ -11,6 +11,9 @@ beszél a MIDI interfésszel. Nincs Python, nincs szerver.
 | `/api/factory` + `syx/original_ME-5.syx` | `factory.js` (beágyazott gyári dump) |
 | `backend/data/syx/` fájllista | Load: fájlválasztó vagy húzd rá a .syx-et az oldalra; Save: letöltés |
 
+Használati leírás: [`utmutato.html`](utmutato.html) (magyar) és [`guide.html`](guide.html) (English),
+az editor fejlécéből is elérhetők.
+
 ## Indítás
 
 - Chrome vagy Edge kell (asztali vagy Android). **Safari / iOS nem támogatja a Web MIDI-t.**
