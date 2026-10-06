@@ -16,8 +16,7 @@
       "tools/vscode": true
     },
     "search.exclude": {
-      "tools/**": true,
-      "js/jquery-*.js": true
+      "tools/**": true
     },
     "files.watcherExclude": {
       "**/tools/vscode/**": true,

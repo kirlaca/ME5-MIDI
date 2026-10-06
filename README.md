@@ -1,146 +1,67 @@
-# Boss-ME5-Editor
-Javascripted webinterface MIDI control
+# ME-5 MIDI Editor
 
-A while ago I bought an ME-5 Multi Effect pedal manufactured by Boss Roland. Great sound! It is totally analog apart from the reverb/delay. As with all stompboxes -in my experience- the sound is very different using it at home or using it in the rehearsel room or gig. The ME-5 has a headphone output and then it sounds all different again. My peer musicians do not have much patience to wait for me to get the right sound, so I try to program it at home, where the sound is different, but it is never spot on the moment I use it with another amp. What I need is a way to program my floorboard on the spot, without much effort.
+A pedalboard-style patch editor for the **BOSS ME-5 Guitar Multiple Effects** (1988), controlled over MIDI SysEx from a computer or phone.
 
-Digging into the specs of the ME-5 I noticed it has MIDI capabilities. Would it be possible to control the settings through that?
+**Open it in the browser:** https://kirlaca.github.io/ME5-MIDI/
 
-Short answer: YES IT IS!
+No install needed: the editor runs entirely in Chrome or Edge using the Web MIDI API.
 
-Even better: I can do it remote, via Wifi. I could even control it from my house or from anywhere in the world (no use there, but it is possible).
+## What it does
 
+- Shows the ME-5 as a virtual pedalboard in the pedal's own signal order: Compressor → OD/Distortion → EQ → Chorus/Flanger → Send/Return → Noise Suppressor → Reverb/Delay → Master. Each block looks like the BOSS compact pedal it is based on (CS-2, OD-2 / OD-2 Turbo / DS-1, GE-7, CE-2 / BF-2, NS-2, RV-2 / DD-2).
+- Changes are sent to the pedal live, so you hear them immediately.
+- Reads all 64 patches from the pedal, writes single patches back, and switches patches with Program Change.
+- Patch map of all 64 slots. Corrupt slots (for example after a flat backup battery) are marked and can be repaired.
+- Saves and loads full dumps as `.syx` files.
+- Includes the factory patches, so the editor also works without a pedal, and a "Factory reset" that writes all of them back to the ME-5.
 
-I spent some time comprehending the MIDI protocol, then I spent some more time choosing the right hardware to control it, then I had to learn HTML, javascript, CSS and PHP, and some linux too. But I think I have a working solution now.
+## What you need
 
-My requirements:
-- Control all settings of the ME-5 with some platform independent protocol.
-- Should be fast, and with a minimum in hardware.
-- No pressing buttons on the floorboard (and bend down). Apart from the footswitches of course.
-- Getting the ME-5 in manual mode. (Again without pressing any buttons on the floorboard).
-- All patches should be available and programmable.
-- Changes in patches can be saved/recalled.
-- A dump save/load function.
-- Low budget.
+- A BOSS ME-5.
+- A USB-MIDI interface connected to both MIDI IN and MIDI OUT of the pedal. Use a decent one: cheap no-name adapters often pass Program Change but drop SysEx. Tested with a DOREMiDi interface.
+- Chrome or Edge on desktop or Android. Safari and iOS do not support Web MIDI.
 
-So I bought myself a raspberry pi zero W and peripheral hardware. Installed it as a webserver, and created a website to control the board from a smartphone. The raspberry acts as an access point in the rehearsel room so I do not need an internet connection. I just log in with my phone, open a webbrowser and all settings are at my disposal.
+## Using it
 
-I now can instantly change any setting with my phone, save it if it is satisfactory, put the ME-5 in manual mode (and back again), change patchnumber. I further can still use all (foot)switches on the ME-5, no functionality is lost.
+1. Connect the interface and put the ME-5 in **Play mode**. In Edit mode the pedal ignores SysEx.
+2. Open the editor and allow MIDI / SysEx access when the browser asks.
+3. Use auto-detect, or pick the MIDI ports and the channel yourself. The SysEx device ID is the pedal's MIDI channel − 1, and detection finds it automatically.
+4. Press **Read ME-5** to load the patches from the pedal.
 
-Hardware needed:
+User guides: [English](webmidi/guide.html) · [Magyar](webmidi/utmutato.html). They can also be opened from the editor's header.
 
-- ME-5 (obviously)
-- raspberry pi zero w (*)
-- Midi cable (**)
+## Repository layout
 
-* Any raspberry would do I guess, I used a Zero W. Any computer that can handle a webserver will do, I tested it on Ubuntu.
+| Path | What it is |
+|---|---|
+| `webmidi/` | **The main editor.** Plain HTML/CSS/JS, no build step, no server. Published on GitHub Pages. |
+| `index.html` | GitHub Pages entry point; redirects to `webmidi/`. |
+| `backend/`, `frontend/` | The same editor running on a local Python backend (FastAPI + python-rtmidi). Windows, optional. |
+| `syx/original_ME-5.syx` | The factory dump (64 patches). |
+| `HASZNALATI_UTASITAS.md`, `ME5_BEMUTATO.md` | Hungarian manual and ME-5 presentation for the Python version. |
 
-** Midi cable (USB) BE SURE TO GET THE GOOD ONE WITH THE OPTICAL INTERFACE
+### Running locally
 
+The Web MIDI editor can be served from any local web server, for example:
 
-I will not go into every detail. Here´s the steps I took:
+```
+python -m http.server -d webmidi
+```
 
-Setup raspberry PI
+Then open the printed `http://localhost:...` address. Browsers may refuse MIDI access on `file://` pages.
 
-Install apache
-sudo apt-get install apache2 -y
-install PHP
-sudo apt-get install php5 libapache2-mod-php5 -y
-install nfs server (optional)
-sudo apt-get install nfs-kernel-server
+### Python version (optional)
 
-The following was done as I initially used a RS232 Midi cable. This code works with a USB-MIDI cable. I am not sure the following is required anymore:
+1. Run `tools\setup-python.cmd` once. It downloads a portable Python into `tools/python/` and installs `backend/requirements.txt`.
+2. Start the editor with `start-editor.cmd`. It runs the backend and opens http://localhost:8000/. Close its window to stop the server.
+3. Optional: `create-shortcut.cmd` creates a desktop shortcut.
 
-For RS232 midi add the following to the end of /boot/config.txt
+Only one program can hold a MIDI port on Windows, so do not run the Python backend and the Web MIDI page at the same time.
 
-enable_uart=1
-dtoverlay=pi3-miniuart-bt
-dtoverlay=midi-uart0
+## Credits and license
 
-OR
+This project started as a fork of [arjenv/Boss-ME5-MIDI-Editor](https://github.com/arjenv/Boss-ME5-MIDI-Editor), a Raspberry Pi + PHP web interface for the ME-5. The editor has since been rewritten, but the MIDI parameter map is based on that work.
 
-enable_uart=1
-dtoverlay=midi_uart1
+Licensed under the GNU GPL v3. See [LICENSE](LICENSE). No warranty: use at your own risk.
 
-(I use the latter, that way the bluetooth is still operative)
-
-These commands configure UART1 (ttyS0) so that a requested 38.4kbaud actually gets 31.25kbaud, the frequency required for MIDI
-
-In cmdline.txt
-Find and remove any mention of ttyAMA0,115200 such as
-“console=ttyAMA0,115200” and “kgdboc=ttyAMA0,115200”.
-It should still say "console=tty1" after you've edited it.
-edit: in my case it said console=serial0,115200. remove that too.
-
-The for the webserver:
-
-next add the apache user (www-data) to the dialout group
-sudo usermod -a -G dialout www-data
-check with ´groups www-data´
-
-reboot your pi
-
-sudo mkdir /var/www/html/syx
-sudo chown www-data:www-data /var/www/html/syx
-sudo chmod 744 /var/www/html/syx
-
-syx is the directory users can write to.
-
-in /etc/php/apache set php.ini
-max_input_vars = 3000 (anything larger than ca 2250)
-UPDATE: the php.ini file differs in Jessie and does not
-need to be altered.
-
-Optional:
-
-Install software to set the raspberry as access point so you do not need to login to some router.
-Add a button to shutdown/wake up the raspberry without the need of a keyboard/monitor/mouse/ssh
-Add LEDS to show the status of the raspberry.
-Add a 9V to 5V regulator to power the raspberry from a 9VDC PSU which is compatible to all my other stompboxes (I can daisychain now)
-
-Access Point:
-I followed most of http://www.raspberryconnect.com/network/item/331-raspberry-pi-auto-wifi-hotspot-switch-no-internet-routing
-
-Add button:
-Follow: http://www.stderr.nl/Blog/Hardware/RaspberryPi/PowerButton.html#comments
-
-Add a status LED:
-In /boot/config add the line:
-dtparam=act_led_gpio=23
-
-And connect a led (in series with a resistor of some 2k2) to gpio port 23
-
-Add a 9VDC input port:
-Well I used an LM7805 for that, connected a red LED (with 2k2 resistor in series) to the 5V output).
-
-I build a bomb-proof case around it, so it would n´t be destroyed if someone stepped on it (as with my guitar case...)
-
-I am not a programmer or web-designer, so the layout is minimal design. 
-
-You can have the code under the following conditions:
-
-Do not delete the headers. I once wrote a book on integrated optics under contract at the university. The minute my contract ended my name vanished from this very book. Suddenly the head of the department was the author!
-
-Absolutely no warranty whatsoever, use it at your own risk (I use it now for some 3 years, no smoke yet).
-
----
-
-## Laptop port (this fork)
-
-The Raspberry Pi/PHP layer is being replaced by a Python backend (`backend/`, FastAPI + python-rtmidi) and a new pedalboard-style editor (`frontend/`). The original `me-5-USB.html`, `js/`, `css/` and `php/` are kept for reference.
-
-Run: double-click `start-editor.cmd` (starts the backend and opens the editor in the browser; close its window to stop). `create-shortcut.cmd` puts an "ME-5 Editor" shortcut with the ME-5 icon (`frontend/me5.ico`) on the desktop and in the project folder; run it again after moving the folder. Or start the backend yourself (VS Code task "Backend: Start FastAPI server", or the "ME-5 Editor" launch config) and open http://localhost:8000/.
-
-User manual (Hungarian): [HASZNALATI_UTASITAS.md](HASZNALATI_UTASITAS.md), also served by the editor at `/utmutato.html`; the ME-5 presentation page is at `/bemutato.html`.
-
-### Portable Python
-
-The backend runs on a portable Python in `tools/python/` (the official Windows embeddable package, ~55 MB with the packages), so the whole folder can be copied to another place or PC and started there. `start-editor.cmd`, the VS Code tasks and the launch config all use it. The folder is git-ignored; after a fresh clone run `tools\setup-python.cmd`, which downloads Python, adds pip and installs `backend/requirements.txt` into it. Run it again to update the packages.
-
-### Portable VS Code
-
-`start-vscode.cmd` opens `BOSSME5.code-workspace` in a portable VS Code under `tools/vscode/`. Its settings and extensions stay in `tools/vscode/data/`, separate from any installed VS Code. The folder is git-ignored, so after a fresh clone set it up again:
-
-1. Download the Windows x64 **.zip** from https://code.visualstudio.com/download and extract it to `tools/vscode/`.
-2. Create an empty `tools/vscode/data/` folder. This switches VS Code to portable mode.
-3. Install the extensions:
-   `tools\vscode\bin\code.cmd --install-extension ms-python.python --install-extension esbenp.prettier-vscode`
+BOSS and ME-5 are trademarks of Roland Corporation. This project is not affiliated with Roland.

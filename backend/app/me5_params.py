@@ -1,8 +1,9 @@
 """ME-5 patch parameter map and DT1 patch encoding/decoding.
 
 Addresses and ranges were cross-checked between the original editor
-(js/me-5script-USB.js + the slider limits in me-5-USB.html), a community
-MIDI Designer Pro layout, and the factory dump in syx/original_ME-5.syx.
+(arjenv/Boss-ME5-MIDI-Editor: me-5script-USB.js + the slider limits in
+me-5-USB.html), a community MIDI Designer Pro layout, and the factory dump
+in syx/original_ME-5.syx.
 Where the sources disagreed, the factory dump won (e.g. reverb time tops
 out at 14, not 15).
 
