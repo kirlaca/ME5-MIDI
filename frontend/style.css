@@ -14,6 +14,7 @@
   --led-deep: #c8160d;
   --led-glow: 0 0 4px 1px rgba(255, 59, 47, .9), 0 0 12px 3px rgba(255, 59, 47, .55);
   --ok: #3ecf6b;
+  --warn: #f0b429;
   color-scheme: dark;
 }
 
@@ -137,6 +138,7 @@ button { font: inherit; color: inherit; }
 .btn:hover:not(:disabled) { border-color: #4a4d55; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #07161c; font-weight: 700; }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn.warn { border-color: var(--warn); color: var(--warn); }
 
 /* Auto write countdown: a bar fills the bottom of the Write button; the write happens when it is full. */
 #store { position: relative; overflow: hidden; }
@@ -197,6 +199,10 @@ button { font: inherit; color: inherit; }
 }
 .pm-cell:hover { border-color: #4a4d55; }
 .pm-cell.current { border-color: var(--led); box-shadow: inset 0 0 0 1px var(--led); color: #ffb0a9; }
+/* Held garbage on the ME-5 - showing the factory sound until written back. */
+.pm-cell.invalid { border-style: dashed; border-color: var(--warn); }
+.pm-cell.invalid > span:first-child { color: var(--warn); }
+.pm-cell.invalid.current { border-color: var(--led); }
 .pm-dots { display: flex; gap: 3px; }
 .pm-dot { width: 7px; height: 7px; border-radius: 50%; background: #2c2e33; }
 

@@ -2,7 +2,7 @@
 
 // Opened straight from disk (file://) -> talk to the default dev server.
 const API = location.protocol === 'file:' ? 'http://localhost:8000' : '';
-const MIDI_CHANNEL = 0; // ME-5 on MIDI channel 1, as in the original editor
+const MIDI_CHANNELS = 16;
 const PROGRAM_CHANGE = 0xC0;
 
 // One skin per pedal the ME-5 models. Colours are approximations - tweak freely.
@@ -34,10 +34,11 @@ const state = {
   meta: null,      // /api/params response
   byKey: {},
   library: [],     // 64 x {param: value}
+  invalid: new Set(), // patch numbers that held garbage on the ME-5 (library has the factory sound there)
   source: '',
   current: 0,
   values: null,    // the sound being edited (ME-5 temp buffer)
-  conn: null,      // {output, input} when talking to a real ME-5
+  conn: null,      // {output, input, channel} when talking to a real ME-5; channel 0-15 is also the SysEx device ID
   original: null,  // the patch as it was when selected - Revert returns here, even after an auto write
   autoWrite: false,
   // Last sub-mode per pedal, so flipping CE-2 -> BF-2 -> CE-2 or RV-3 -> DD-2 -> RV-3 comes back where it was.
@@ -194,7 +195,7 @@ function selectPatch(n, { send = true } = {}) {
   renderAll();
   if (send && state.conn) {
     const program = state.current;
-    pending.then(() => sendMidi([PROGRAM_CHANGE | MIDI_CHANNEL, program])).catch(e => toast(e.message, 'error'));
+    pending.then(() => sendMidi([PROGRAM_CHANGE | state.conn.channel, program])).catch(e => toast(e.message, 'error'));
   }
 }
 
@@ -206,6 +207,7 @@ function setLibrary(patches, source) {
   }
   cancelAutoWrite(); // a new library replaces the edited patch anyway
   state.library = library;
+  state.invalid = new Set(patches.filter(p => p.invalid).map(p => p.patch_number));
   state.source = source;
   selectPatch(state.current, { send: false });
 }
@@ -221,7 +223,7 @@ function queueTempSend() {
 
 async function sendTemp() {
   try {
-    const { data } = await api('/api/patch/encode', { values: state.values, patch_number: null });
+    const { data } = await api('/api/patch/encode', { values: state.values, patch_number: null, channel: state.conn.channel });
     await sendMidi(data);
   } catch (e) {
     toast(`Send failed: ${e.message}`, 'error');
@@ -524,9 +526,10 @@ function renderPatchMap() {
     for (let i = 0; i < 16; i++) {
       const n = g * 16 + i;
       const values = state.library[n];
-      const cell = h('button', `pm-cell${n === state.current ? ' current' : ''}`);
+      const invalid = state.invalid.has(n);
+      const cell = h('button', `pm-cell${n === state.current ? ' current' : ''}${invalid ? ' invalid' : ''}`);
       cell.type = 'button';
-      cell.title = `Patch ${patchLabel(n)}`;
+      cell.title = `Patch ${patchLabel(n)}${invalid ? ' - invalid data on the ME-5, factory sound loaded' : ''}`;
       cell.append(h('span', '', `${Math.floor(i / 4) + 1}-${(i % 4) + 1}`));
       const dots = h('span', 'pm-dots');
       for (const block of bitBlocks) {
@@ -540,13 +543,21 @@ function renderPatchMap() {
     }
     map.append(group);
   }
+  renderRepair();
+}
+
+function renderRepair() {
+  const btn = $('#lib-repair');
+  btn.hidden = !state.conn || !state.invalid.size;
+  btn.textContent = `Repair ${state.invalid.size}`;
 }
 
 function renderStatus() {
   const btn = $('#conn-status');
   btn.classList.toggle('online', Boolean(state.conn));
-  $('#conn-text').textContent = state.conn ? state.conn.output : 'Offline';
+  $('#conn-text').textContent = state.conn ? `${state.conn.output} · ch ${state.conn.channel + 1}` : 'Offline';
   $('#lib-read').disabled = !state.conn;
+  renderRepair();
 }
 
 function renderAll() {
@@ -567,10 +578,11 @@ async function writePatch({ auto = false } = {}) {
   cancelAutoWrite();
   try {
     if (state.conn) {
-      const { data } = await api('/api/patch/encode', { values, patch_number: n });
+      const { data } = await api('/api/patch/encode', { values, patch_number: n, channel: state.conn.channel });
       await sendMidi(data);
     }
     state.library[n] = values;
+    state.invalid.delete(n);
     renderPatchMap();
     refreshIndicators();
     const where = state.conn ? label : `${label} (editor only - offline)`;
@@ -603,12 +615,39 @@ async function readFromMe5() {
   btn.textContent = 'Reading…';
   try {
     setLibrary((await api('/api/dump/read', state.conn)).patches, 'Read from ME-5');
-    toast('Read 64 patches from the ME-5');
+    const bad = state.invalid.size;
+    toast(bad
+      ? `Read 64 patches - ${bad} held invalid data and show the factory sound. Repair writes it back.`
+      : 'Read 64 patches from the ME-5', bad ? 'error' : '');
   } catch (e) {
     toast(`Read failed: ${e.message}`, 'error');
   } finally {
     btn.textContent = 'Read ME-5';
     renderStatus();
+  }
+}
+
+// Writes the factory sound the editor shows for each invalid patch onto the ME-5.
+async function repairInvalid() {
+  const todo = [...state.invalid].sort((a, b) => a - b);
+  if (!state.conn || !todo.length) return;
+  if (!confirm(`Write the factory sound into the ${todo.length} invalid patches on the ME-5?`)) return;
+  const btn = $('#lib-repair');
+  btn.disabled = true;
+  try {
+    for (const n of todo) {
+      btn.textContent = `Repairing ${patchLabel(n)}…`;
+      const { data } = await api('/api/patch/encode', { values: state.library[n], patch_number: n, channel: state.conn.channel });
+      await sendMidi(data);
+      state.invalid.delete(n);
+      await new Promise(r => setTimeout(r, 100)); // give the pedal time to store it
+    }
+    toast(`Repaired ${todo.length} patches`);
+  } catch (e) {
+    toast(`Repair failed: ${e.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    renderPatchMap();
   }
 }
 
@@ -688,6 +727,13 @@ async function openConnDialog() {
         return o;
       }));
     }
+    const channel = state.conn?.channel ?? 0;
+    $('#port-channel').replaceChildren(...Array.from({ length: MIDI_CHANNELS }, (_, i) => {
+      const o = h('option', '', String(i + 1));
+      o.value = i;
+      o.selected = i === channel;
+      return o;
+    }));
     if (!outputs.length) msg.textContent = 'No MIDI ports found - is the interface plugged in?';
   } catch (e) {
     msg.textContent = e.message;
@@ -697,7 +743,7 @@ async function openConnDialog() {
 async function autoDetect() {
   const btn = $('#conn-detect');
   btn.disabled = true;
-  $('#conn-msg').textContent = 'Searching every port pair…';
+  $('#conn-msg').textContent = 'Searching every port pair and channel…';
   try {
     connect(await api('/api/detect', {}));
   } catch (e) {
@@ -723,12 +769,14 @@ function wire() {
     if (e.key === 'Enter') { e.preventDefault(); saveFile(); }
   });
   $('#lib-read').addEventListener('click', readFromMe5);
+  $('#lib-repair').addEventListener('click', repairInvalid);
   $('#conn-status').addEventListener('click', openConnDialog);
   $('#conn-detect').addEventListener('click', autoDetect);
   $('#conn-use').addEventListener('click', () => {
     const output = $('#port-out').value;
     const input = $('#port-in').value;
-    if (output) connect({ output, input });
+    const channel = Number($('#port-channel').value);
+    if (output) connect({ output, input, channel });
   });
   $('#conn-disconnect').addEventListener('click', () => connect(null));
 

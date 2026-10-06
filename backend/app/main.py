@@ -11,7 +11,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from . import me5_params, midi_service, storage
 
@@ -45,7 +45,7 @@ def detect():
     found = midi_service.detect_me5()
     if found is None:
         raise HTTPException(status_code=404, detail="ME-5 not found on any MIDI port")
-    return {"output": found.output, "input": found.input}
+    return {"output": found.output, "input": found.input, "channel": found.channel}
 
 
 class SysexRequest(BaseModel):
@@ -81,18 +81,25 @@ def send(req: SendRequest):
     return {"ok": True}
 
 
+# 0-15 = MIDI channel 1-16; the ME-5 also uses it as its SysEx device ID.
+Channel = Field(default=me5_params.FILE_CHANNEL, ge=0, lt=me5_params.MIDI_CHANNELS)
+
+
 class DumpReadRequest(BaseModel):
     output: str
     input: str
+    channel: int = Channel
     timeout_ms: int = 500
 
 
 @app.post("/api/dump/read")
 def read_dump(req: DumpReadRequest):
-    """Request all 64 patches from the ME-5 and return them decoded."""
+    """Request all 64 patches from the ME-5 and return them decoded.
+    Patches the pedal holds garbage in come back as the factory patch for
+    that slot, flagged "invalid", so the rest can still be edited."""
     try:
         response = midi_service.send_sysex_and_wait(
-            req.output, req.input, me5_params.DUMP_REQUEST, req.timeout_ms
+            req.output, req.input, me5_params.dump_request(req.channel), req.timeout_ms
         )
     except midi_service.MidiPortNotFound as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -101,18 +108,19 @@ def read_dump(req: DumpReadRequest):
             status_code=504,
             detail=f"expected {me5_params.DUMP_LENGTH} bytes from the ME-5, got {len(response)}",
         )
-    try:
-        patches = me5_params.decode_dump(response[: me5_params.DUMP_LENGTH])
-    except me5_params.PatchError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    patches = me5_params.decode_dump_repairing(response[: me5_params.DUMP_LENGTH], read_factory())
     return {"patches": patches}
+
+
+def read_factory() -> list[dict]:
+    return me5_params.decode_dump(list(FACTORY_DUMP.read_bytes()))
 
 
 @app.get("/api/factory")
 def factory_patches():
     """The 64 factory patches from syx/original_ME-5.syx - lets the editor
     work with real data when no ME-5 is connected."""
-    return {"patches": me5_params.decode_dump(list(FACTORY_DUMP.read_bytes()))}
+    return {"patches": read_factory()}
 
 
 @app.get("/api/params")
@@ -132,12 +140,14 @@ class EncodePatchRequest(BaseModel):
     values: dict[str, int]
     # None = temp/edit buffer, 0-63 = store into that patch
     patch_number: int | None = None
+    # The ME-5's channel when sending to it; leave at 0 for patch files.
+    channel: int = Channel
 
 
 @app.post("/api/patch/encode")
 def encode_patch(req: EncodePatchRequest):
     try:
-        message = me5_params.encode_patch(req.values, req.patch_number)
+        message = me5_params.encode_patch(req.values, req.patch_number, req.channel)
     except me5_params.PatchError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return {"data": message}

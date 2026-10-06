@@ -75,7 +75,7 @@
           </ul>
           Egyes kábeleken fordítva van a felirat, és azt jelöli, hová kell dugni. Ha a patchváltás nem megy, próbáld meg felcserélni a két dugót.</li>
         <li>Dugd az interfész USB csatlakozóját a laptopba. A Windows magától felismeri; a Roland UM-ONE mkII-höz nem kell külön driver.</li>
-        <li>Kapcsold be az ME-5-öt. A MIDI csatorna legyen <strong>1</strong>, vagy kapcsold be az OMNI módot (az ME-5 kézikönyve szerint a MIDI beállításoknál).</li>
+        <li>Kapcsold be az ME-5-öt. A MIDI csatorna bármelyik lehet (1–16): az Auto-detect megkeresi, kézi csatlakozásnál pedig te adod meg. Az ME-5 legyen <strong>Play módban</strong>: Edit módban nem fogad SysEx-et, így az editor nem tudja sem beolvasni, sem állítani a hangokat, csak a patchváltás működik.</li>
         <li>Indítsd el a programot (<a href="#inditas">3. pont</a>), és csatlakozz a <a href="#csatlakozas">4. pont</a> szerint.</li>
       </ol>
       <p class="note"><strong>Próba:</strong> csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Ezután a <strong>Read ME-5</strong> gombbal ellenőrizheted, hogy a SysEx is átmegy-e: ha sikerül, a program kiolvassa mind a 64 patchet.</p>
@@ -99,11 +99,11 @@
         <li>Kattints a jobb felső sarokban az <strong>Offline</strong> feliratra.</li>
         <li>Válassz egyet:
           <ul>
-            <li><strong>Auto-detect</strong>: minden portpáron megkeresi az ME-5-öt. Ehhez működő SysEx kell.</li>
-            <li>Kézzel: válaszd ki az <strong>Output (to ME-5)</strong> és az <strong>Input (from ME-5)</strong> portot, majd kattints a <strong>Use these ports</strong> gombra. A patchváltás így akkor is működik, ha a SysEx nem.</li>
+            <li><strong>Auto-detect</strong>: minden portpáron és MIDI csatornán megkeresi az ME-5-öt. Ehhez működő SysEx kell.</li>
+            <li>Kézzel: válaszd ki az <strong>Output (to ME-5)</strong> és az <strong>Input (from ME-5)</strong> portot, az <strong>ME-5 MIDI channel</strong> mezőben az ME-5 csatornáját, majd kattints a <strong>Use these ports</strong> gombra. A patchváltás így akkor is működik, ha a SysEx nem.</li>
           </ul>
         </li>
-        <li>Csatlakozás után a felirat zöldre vált, és a kimeneti port neve látszik rajta.</li>
+        <li>Csatlakozás után a felirat zöldre vált, és a kimeneti port neve és a MIDI csatorna látszik rajta.</li>
         <li>A <strong>Go offline</strong> gomb bontja a kapcsolatot.</li>
       </ol>
       <p>Offline módban minden szerkesztés csak az editorban történik, az ME-5-re nem jut el semmi.</p>
@@ -177,7 +177,8 @@
         <thead><tr><th>Tünet</th><th>Megoldás</th></tr></thead>
         <tbody>
           <tr><td>„Can't reach the backend”</td><td>A szerver nem fut. Indítsd el a <a href="#inditas">3. pont</a> szerint.</td></tr>
-          <tr><td>Az Auto-detect nem találja az ME-5-öt</td><td>Ellenőrizd a MIDI IN/OUT bekötést és a MIDI csatornát. Ha a kézi portválasztással a patchváltás működik, de a SysEx nem, akkor a kábel nem viszi át a SysEx üzeneteket (lásd <a href="#kell">1. pont</a>).</td></tr>
+          <tr><td>Az Auto-detect nem találja az ME-5-öt</td><td>Ellenőrizd, hogy az ME-5 Play módban van. Ellenőrizd a MIDI IN/OUT bekötést: az ME-5 MIDI OUT-ja az interfész bemenetére menjen, a MIDI IN-je a kimenetére. Ha a kézi portválasztással a patchváltás működik, de a SysEx nem, akkor a kábel nem viszi át a SysEx üzeneteket (lásd <a href="#kell">1. pont</a>).</td></tr>
+          <tr><td>Az editor beállításai nem hallatszanak, a Read ME-5 nem működik, de a patchváltás igen</td><td>Az ME-5 valószínűleg Edit módban van. Állítsd Play módba.</td></tr>
           <tr><td>A „Read ME-5” gomb szürke</td><td>Előbb csatlakozz (<a href="#csatlakozas">4. pont</a>).</td></tr>
           <tr><td>A Read vagy a Write hibát jelez</td><td>A SysEx nem jut át. Ugyanaz az ok, mint fent.</td></tr>
           <tr><td>A módosítás elveszett patchváltás után</td><td>Patchváltás előtt kattints a <strong>Write</strong> gombra, vagy kapcsold be az <strong>Auto write</strong>-ot.</td></tr>

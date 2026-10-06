@@ -30,7 +30,7 @@ A program arjenv [Boss-ME5-MIDI-Editor](https://github.com/arjenv/Boss-ME5-MIDI-
 
    Egyes kábeleken fordítva van a felirat, és azt jelöli, hová kell dugni. Ha a patchváltás nem megy, próbáld meg felcserélni a két dugót.
 3. Dugd az interfész USB csatlakozóját a laptopba. A Windows magától felismeri; a Roland UM-ONE mkII-höz nem kell külön driver.
-4. Kapcsold be az ME-5-öt. A MIDI csatorna legyen **1**, vagy kapcsold be az OMNI módot (az ME-5 kézikönyve szerint a MIDI beállításoknál).
+4. Kapcsold be az ME-5-öt. A MIDI csatorna bármelyik lehet (1–16): az Auto-detect megkeresi, kézi csatlakozásnál pedig te adod meg. Az ME-5 legyen **Play módban**: Edit módban nem fogad SysEx-et, így az editor nem tudja sem beolvasni, sem állítani a hangokat, csak a patchváltás működik.
 5. Indítsd el a programot (3. pont), és csatlakozz a 4. pont szerint.
 
 **Próba:** csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Ezután a **Read ME-5** gombbal ellenőrizheted, hogy a SysEx is átmegy-e: ha sikerül, a program kiolvassa mind a 64 patchet.
@@ -64,9 +64,9 @@ Ha a program a „Can't reach the backend” üzenetet írja ki, a szerver nem f
 
 1. Kattints a jobb felső sarokban az **Offline** feliratra.
 2. Válassz egyet:
-   - **Auto-detect**: minden portpáron megkeresi az ME-5-öt. Ehhez működő SysEx kell.
-   - Kézzel: válaszd ki az **Output (to ME-5)** és az **Input (from ME-5)** portot, majd kattints a **Use these ports** gombra. A patchváltás így akkor is működik, ha a SysEx nem.
-3. Csatlakozás után a felirat zöldre vált, és a kimeneti port neve látszik rajta.
+   - **Auto-detect**: minden portpáron és MIDI csatornán megkeresi az ME-5-öt. Ehhez működő SysEx kell.
+   - Kézzel: válaszd ki az **Output (to ME-5)** és az **Input (from ME-5)** portot, az **ME-5 MIDI channel** mezőben az ME-5 csatornáját, majd kattints a **Use these ports** gombra. A patchváltás így akkor is működik, ha a SysEx nem.
+3. Csatlakozás után a felirat zöldre vált, és a kimeneti port neve és a MIDI csatorna látszik rajta.
 4. A **Go offline** gomb bontja a kapcsolatot.
 
 Offline módban minden szerkesztés csak az editorban történik, az ME-5-re nem jut el semmi.
@@ -140,7 +140,8 @@ A jobb oldali felirat mutatja, honnan származnak az éppen betöltött patchek 
 | Tünet | Megoldás |
 |---|---|
 | „Can't reach the backend” | A szerver nem fut. Indítsd el a 3. pont szerint. |
-| Az Auto-detect nem találja az ME-5-öt | Ellenőrizd a MIDI IN/OUT bekötést és a MIDI csatornát. Ha a kézi portválasztással a patchváltás működik, de a SysEx nem, akkor a kábel nem viszi át a SysEx üzeneteket (lásd 1. pont). |
+| Az Auto-detect nem találja az ME-5-öt | Ellenőrizd, hogy az ME-5 Play módban van. Ellenőrizd a MIDI IN/OUT bekötést: az ME-5 MIDI OUT-ja az interfész bemenetére menjen, a MIDI IN-je a kimenetére. Ha a kézi portválasztással a patchváltás működik, de a SysEx nem, akkor a kábel nem viszi át a SysEx üzeneteket (lásd 1. pont). |
+| Az editor beállításai nem hallatszanak, a Read ME-5 nem működik, de a patchváltás igen | Az ME-5 valószínűleg Edit módban van. Állítsd Play módba. |
 | A „Read ME-5” gomb szürke | Előbb csatlakozz (4. pont). |
 | A Read vagy a Write hibát jelez | A SysEx nem jut át. Ugyanaz az ok, mint fent. |
 | A módosítás elveszett patchváltás után | Patchváltás előtt kattints a **Write** gombra. |

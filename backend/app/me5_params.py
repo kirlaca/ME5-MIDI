@@ -7,7 +7,10 @@ Where the sources disagreed, the factory dump won (e.g. reverb time tops
 out at 14, not 15).
 
 Patch format: 35-byte DT1 message
-    F0 41 00 1F 12 <addr MSB> <addr LSB> <26 data bytes> <checksum> F7
+    F0 41 <dev> 1F 12 <addr MSB> <addr LSB> <26 data bytes> <checksum> F7
+
+<dev> is the Roland device ID, which on the ME-5 is its MIDI channel - 1
+(0x00-0x0F): the pedal ignores SysEx sent to any other device ID.
 
 Unlike the standard Roland scheme, the ME-5 checksum covers only the 26
 data bytes, not the address - all 64 factory patches verify this way and
@@ -21,12 +24,14 @@ from typing import Callable
 SOX = 0xF0
 EOX = 0xF7
 ROLAND_ID = 0x41
-DEVICE_ID = 0x00
 MODEL_ID = 0x1F
 CMD_RQ1 = 0x11
 CMD_DT1 = 0x12
 
-HEADER = [SOX, ROLAND_ID, DEVICE_ID, MODEL_ID]
+MIDI_CHANNELS = 16  # 0-15 = MIDI channel 1-16, also the SysEx device ID
+# Patch files are written with device ID 0, as in the factory dump, so they
+# don't depend on the channel of the pedal they came from.
+FILE_CHANNEL = 0
 
 PARAM_COUNT = 26
 PATCH_MESSAGE_LENGTH = 35  # header(5) + address(2) + data(26) + checksum + EOX
@@ -34,9 +39,6 @@ PATCH_COUNT = 64
 
 TEMP_ADDRESS = (0x00, 0x00)  # edit buffer - what the pedal is playing right now
 
-# Full 64-patch dump request, byte for byte what the original editor's
-# ME5readall() sent (size 7F 7F = "everything", checksum left at 00).
-DUMP_REQUEST = [SOX, ROLAND_ID, DEVICE_ID, MODEL_ID, CMD_RQ1, 0x10, 0x00, 0x7F, 0x7F, 0x00, EOX]
 DUMP_LENGTH = PATCH_COUNT * PATCH_MESSAGE_LENGTH
 
 # Bits of the effect on/off byte (address 0x00).
@@ -195,20 +197,41 @@ def validate_patch(values: dict[str, int]) -> None:
             raise PatchError(f"{p.key} out of range 0-{limit}: {value!r}")
 
 
-def encode_patch(values: dict[str, int], patch_number: int | None = None) -> list[int]:
+def header(channel: int) -> list[int]:
+    if not 0 <= channel < MIDI_CHANNELS:
+        raise PatchError(f"MIDI channel must be 0-{MIDI_CHANNELS - 1}, got {channel!r}")
+    return [SOX, ROLAND_ID, channel, MODEL_ID]
+
+
+def dump_request(channel: int) -> list[int]:
+    """Full 64-patch dump request - what the original editor's ME5readall()
+    sent (size 7F 7F = "everything", checksum left at 00), addressed to the
+    pedal on `channel`."""
+    return [*header(channel), CMD_RQ1, 0x10, 0x00, 0x7F, 0x7F, 0x00, EOX]
+
+
+def encode_patch(
+    values: dict[str, int], patch_number: int | None = None, channel: int = FILE_CHANNEL
+) -> list[int]:
     """Build a DT1 message. patch_number=None writes the temp/edit buffer,
     0-63 writes (stores) that patch."""
     validate_patch(values)
     address = TEMP_ADDRESS if patch_number is None else patch_address(patch_number)
     data = [values[p.key] for p in PARAMS]
-    return [*HEADER, CMD_DT1, *address, *data, checksum(data), EOX]
+    return [*header(channel), CMD_DT1, *address, *data, checksum(data), EOX]
 
 
 def decode_patch(message: list[int], verify_checksum: bool = True) -> dict:
     """Parse one 35-byte DT1 patch message."""
     if len(message) != PATCH_MESSAGE_LENGTH:
         raise PatchError(f"patch message must be {PATCH_MESSAGE_LENGTH} bytes, got {len(message)}")
-    if message[:5] != [*HEADER, CMD_DT1] or message[-1] != EOX:
+    # Any device ID: dumps carry the channel of the pedal they came from.
+    if (
+        message[:2] != [SOX, ROLAND_ID]
+        or message[2] >= MIDI_CHANNELS
+        or message[3:5] != [MODEL_ID, CMD_DT1]
+        or message[-1] != EOX
+    ):
         raise PatchError("not an ME-5 DT1 message")
     data = message[7:7 + PARAM_COUNT]
     if verify_checksum and checksum(data) != message[33]:
@@ -233,6 +256,26 @@ def decode_dump(dump: list[int], verify_checksum: bool = True) -> list[dict]:
         decode_patch(dump[i:i + PATCH_MESSAGE_LENGTH], verify_checksum)
         for i in range(0, len(dump), PATCH_MESSAGE_LENGTH)
     ]
+
+
+def decode_dump_repairing(dump: list[int], fallback: list[dict]) -> list[dict]:
+    """decode_dump for a full dump read from a pedal: a patch that does not
+    decode (e.g. garbage left by a flat backup battery) is replaced with
+    fallback[slot] and flagged with "invalid": <reason>, instead of failing
+    the whole read. The dump comes in patch order, so slot = position."""
+    if len(dump) != DUMP_LENGTH:
+        raise PatchError(f"expected a {DUMP_LENGTH}-byte dump, got {len(dump)} bytes")
+    patches = []
+    for slot in range(PATCH_COUNT):
+        message = dump[slot * PATCH_MESSAGE_LENGTH:(slot + 1) * PATCH_MESSAGE_LENGTH]
+        try:
+            patch = decode_patch(message)
+            if patch["patch_number"] != slot:
+                raise PatchError(f"patch {patch['patch_label']} arrived in slot {patch_label(slot)}")
+        except PatchError as exc:
+            patch = {**fallback[slot], "patch_number": slot, "patch_label": patch_label(slot), "invalid": str(exc)}
+        patches.append(patch)
+    return patches
 
 
 def display_values(values: dict[str, int]) -> dict[str, str]:

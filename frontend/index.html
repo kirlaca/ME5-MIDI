@@ -50,6 +50,8 @@
       <button id="lib-load" class="btn" type="button">Load file…</button>
       <button id="lib-save" class="btn" type="button">Save file…</button>
       <button id="lib-read" class="btn" type="button" title="Read all 64 patches from the ME-5">Read ME-5</button>
+      <button id="lib-repair" class="btn warn" type="button" hidden
+        title="Write the factory sound into every patch that held invalid data on the ME-5">Repair</button>
       <span id="source" class="source"></span>
     </div>
   </section>
@@ -66,10 +68,11 @@
   <dialog id="conn-dialog">
     <form method="dialog">
       <h2>MIDI connection</h2>
-      <p class="hint">Auto-detect sends an identity request on every port pair. Picking ports by hand works for
-        patch changes even when SysEx replies don't come back.</p>
+      <p class="hint">Auto-detect sends an identity request on every port pair and MIDI channel. Picking ports by
+        hand works for patch changes even when SysEx replies don't come back - set the channel to the ME-5's.</p>
       <label class="field">Output (to ME-5)<select id="port-out"></select></label>
       <label class="field">Input (from ME-5)<select id="port-in"></select></label>
+      <label class="field">ME-5 MIDI channel<select id="port-channel"></select></label>
       <p id="conn-msg" class="hint"></p>
       <div class="dialog-actions">
         <button id="conn-disconnect" class="btn" type="button">Go offline</button>
