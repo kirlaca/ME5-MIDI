@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ME-5 Editor (Web MIDI)</title>
+  <link rel="icon" href="me5.svg" type="image/svg+xml">
+  <link rel="icon" href="me5.ico" sizes="any">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-model">ME-5</span>
+      <span class="brand-sub">Guitar Multiple Effects</span>
+      <span class="brand-tag">Web MIDI</span>
+    </div>
+    <div class="topbar-right">
+      <button id="conn-status" class="status" type="button">
+        <span class="dot"></span><span id="conn-text">Offline</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="unit">
+    <div class="patch-nav">
+      <button id="prev" class="nav-btn" type="button" aria-label="Previous patch">&#9664;</button>
+      <div class="display" aria-live="polite">
+        <span id="patch-label" class="display-digits">-·-·-</span>
+        <span class="display-meta">
+          <span id="patch-num">#--</span>
+          <span id="edited" class="edited">EDIT</span>
+        </span>
+      </div>
+      <button id="next" class="nav-btn" type="button" aria-label="Next patch">&#9654;</button>
+    </div>
+
+    <div class="actions">
+      <button id="store" class="btn" type="button" title="Write the edited sound into the current patch">Write</button>
+      <button id="revert" class="btn" type="button" title="Throw away edits to this patch">Revert</button>
+      <label class="toggle" title="Write edits into the current patch automatically, 5 s after the last change">
+        <input id="auto-write" type="checkbox"> Auto write
+      </label>
+      <span class="sep"></span>
+      <button id="lib-factory" class="btn" type="button">Factory</button>
+      <button id="lib-load" class="btn" type="button">Load file…</button>
+      <button id="lib-save" class="btn" type="button">Save file…</button>
+      <input id="file-input" type="file" accept=".syx,application/octet-stream" hidden>
+      <button id="lib-read" class="btn" type="button" title="Read all 64 patches from the ME-5">Read ME-5</button>
+      <button id="lib-repair" class="btn warn" type="button" hidden
+        title="Write the factory sound into every patch that held invalid data on the ME-5">Repair</button>
+      <span id="source" class="source"></span>
+    </div>
+  </section>
+
+  <details class="patch-map" open>
+    <summary>Patches</summary>
+    <div id="patch-map" class="pm-groups"></div>
+  </details>
+
+  <main class="board">
+    <div id="chain" class="chain"></div>
+  </main>
+
+  <dialog id="conn-dialog">
+    <form method="dialog">
+      <h2>MIDI connection</h2>
+      <p class="hint">The browser talks to the MIDI interface directly (Web MIDI) - allow MIDI / SysEx access when it
+        asks. Auto-detect sends an identity request on every port and MIDI channel; the ME-5 must be in Play mode.
+        Picking ports by hand works for patch changes even when SysEx replies don't come back - set the channel to
+        the ME-5's.</p>
+      <label class="field">Output (to ME-5)<select id="port-out"></select></label>
+      <label class="field">Input (from ME-5)<select id="port-in"></select></label>
+      <label class="field">ME-5 MIDI channel<select id="port-channel"></select></label>
+      <p id="conn-msg" class="hint"></p>
+      <div class="dialog-actions">
+        <button id="conn-disconnect" class="btn" type="button">Go offline</button>
+        <button id="conn-detect" class="btn" type="button">Auto-detect</button>
+        <button id="conn-use" class="btn primary" type="button">Use these ports</button>
+        <button class="btn" value="cancel">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="file-dialog">
+    <form method="dialog">
+      <h2>Save patches to file</h2>
+      <p class="hint">All 64 patches as a .syx dump - the browser downloads it.</p>
+      <label class="field">File name<input id="file-name" type="text" autocomplete="off"
+          spellcheck="false"></label>
+      <div class="dialog-actions">
+        <button class="btn" value="cancel">Cancel</button>
+        <button id="file-ok" class="btn primary" type="button">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="factory.js"></script>
+  <script src="me5.js"></script>
+  <script src="midi.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
