@@ -52,6 +52,8 @@
       <button id="lib-read" class="btn" type="button" title="Read all 64 patches from the ME-5">Read ME-5</button>
       <button id="lib-repair" class="btn warn" type="button" hidden
         title="Write the factory sound into every patch that held invalid data on the ME-5">Repair</button>
+      <button id="lib-reset" class="btn danger-outline" type="button" hidden
+        title="Write all 64 factory patches into the ME-5">Factory reset ME-5</button>
       <span id="source" class="source"></span>
     </div>
   </section>
@@ -98,6 +100,7 @@
 
   <div id="toast" class="toast" role="status"></div>
 
+  <script src="ask.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -77,13 +77,15 @@ Offline módban minden szerkesztés csak az editorban történik, az ME-5-re nem
 
 | Elem | Mit csinál |
 |---|---|
-| ◀ ▶ és a kijelző | Patchváltás. A kijelzőn a patch neve (pl. `2-3-4` = bank 2, csoport 3, szám 4) és a sorszáma (`#0`–`#63`) látszik. |
+| ◀ ▶ és a kijelző | Patchváltás. A kijelzőn a patch neve (pl. `2-3-4` = 2. csoport, 3. bank, 4. patch, mint a pedálon) és a sorszáma (`#01`–`#64`) látszik. |
 | **EDIT** jelzés | Pirosan világít, ha az aktuális patchet módosítottad, de még nem írtad vissza. |
 | **Write** | Beírja a módosított hangzást az aktuális patchbe. Kapcsolat esetén előbb megerősítést kér, mert felülírja a patchet az ME-5-ön. |
 | **Revert** | Eldobja a módosításokat, és visszaállítja a patch eredeti értékeit. |
 | **Factory** | Betölti a 64 gyári patchet az editorba. |
 | **Load file…** / **Save file…** | Mind a 64 patchet `.syx` fájlba menti, vagy fájlból tölti be (részletek a 7. pontban). |
 | **Read ME-5** | Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható. |
+| **Repair N** | Csak akkor látszik, ha a Read ME-5 hibás (értelmetlen adatot tartalmazó) patcheket talált; ezeket a patchtérkép szaggatott, borostyánszínű kerettel jelöli, és az editor a gyári hangzást mutatja helyettük. A gomb megerősítés után a gyári hangzást írja vissza ezekbe a patchekbe az ME-5-ön. |
+| **Factory reset ME-5** | Csak csatlakozás után látszik. Mind a 64 gyári patchet beírja az ME-5-be, függetlenül attól, mi van éppen az editorban. Előtte egy piros figyelmeztető ablakban megerősítést kér; a folyamat kb. 7 másodperc, egy folyamatjelző mutatja. **Ez a pedálon lévő összes saját hangzást felülírja**, ezért előtte a Read ME-5 és a Save file… gombbal érdemes biztonsági mentést készíteni. |
 | **Útmutató** / **Bemutató** | Ez a használati utasítás, illetve az ME-5 történetét bemutató oldal, az editorból megnyitva. |
 
 ### Patches (patchtérkép)

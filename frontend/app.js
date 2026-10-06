@@ -549,6 +549,7 @@ function renderPatchMap() {
 function renderRepair() {
   const btn = $('#lib-repair');
   btn.hidden = !state.conn || !state.invalid.size;
+  $('#lib-reset').hidden = !state.conn;
   btn.textContent = `Repair ${state.invalid.size}`;
 }
 
@@ -574,7 +575,12 @@ async function writePatch({ auto = false } = {}) {
   const values = { ...state.values };
   const label = patchLabel(n);
   // Turning auto write on is the consent - no dialog then.
-  if (state.conn && !auto && !state.autoWrite && !confirm(`Overwrite patch ${label} on the ME-5?`)) return;
+  if (state.conn && !auto && !state.autoWrite && !await Ask.confirm({
+    icon: 'question',
+    title: `Write patch ${label}?`,
+    text: 'The edited sound replaces this patch on the ME-5.',
+    confirmText: 'Write',
+  })) return;
   cancelAutoWrite();
   try {
     if (state.conn) {
@@ -627,27 +633,69 @@ async function readFromMe5() {
   }
 }
 
+// Writes `patches` (patch number -> values) into the ME-5 one after the other,
+// with a progress box; onWritten(n) runs after each. Returns how many were written.
+async function writeMany(title, patches, onWritten = () => {}) {
+  const box = Ask.progress({ title, text: "Don't unplug the MIDI cable or switch the ME-5 off." });
+  let done = 0;
+  try {
+    for (const [n, values] of patches) {
+      box.update(done / patches.length, `Writing ${patchLabel(n)}…  ${done + 1} / ${patches.length}`);
+      const { data } = await api('/api/patch/encode', { values, patch_number: n, channel: state.conn.channel });
+      await sendMidi(data);
+      onWritten(n);
+      done++;
+      await new Promise(r => setTimeout(r, 100)); // give the pedal time to store it
+    }
+    box.update(1, 'Done');
+  } finally {
+    box.close();
+  }
+  return done;
+}
+
 // Writes the factory sound the editor shows for each invalid patch onto the ME-5.
 async function repairInvalid() {
   const todo = [...state.invalid].sort((a, b) => a - b);
   if (!state.conn || !todo.length) return;
-  if (!confirm(`Write the factory sound into the ${todo.length} invalid patches on the ME-5?`)) return;
-  const btn = $('#lib-repair');
-  btn.disabled = true;
+  if (!await Ask.confirm({
+    title: `Repair ${todo.length} patches?`,
+    text: `These patches held invalid data on the ME-5. Their factory sound will be written back.`,
+    confirmText: 'Repair',
+  })) return;
   try {
-    for (const n of todo) {
-      btn.textContent = `Repairing ${patchLabel(n)}…`;
-      const { data } = await api('/api/patch/encode', { values: state.library[n], patch_number: n, channel: state.conn.channel });
-      await sendMidi(data);
-      state.invalid.delete(n);
-      await new Promise(r => setTimeout(r, 100)); // give the pedal time to store it
-    }
+    await writeMany('Repairing patches', todo.map(n => [n, state.library[n]]), n => state.invalid.delete(n));
     toast(`Repaired ${todo.length} patches`);
   } catch (e) {
-    toast(`Repair failed: ${e.message}`, 'error');
+    Ask.alert({ icon: 'error', title: 'Repair failed', text: e.message });
   } finally {
-    btn.disabled = false;
     renderPatchMap();
+  }
+}
+
+// Writes all 64 factory patches into the ME-5, whatever the editor is showing.
+async function factoryReset() {
+  if (!state.conn) return;
+  if (!await Ask.confirm({
+    icon: 'danger',
+    title: 'Factory reset the ME-5?',
+    text: [
+      'All 64 patches on the pedal are overwritten with the factory sounds. This cannot be undone.',
+      'To keep your own sounds, press Cancel, then Read ME-5 and Save file… first.',
+    ],
+    confirmText: 'Reset all 64',
+    danger: true,
+  })) return;
+  cancelAutoWrite();
+  try {
+    const { patches } = await api('/api/factory');
+    const written = await writeMany('Factory reset', patches.map((p, n) => [n, p.values]));
+    setLibrary(patches, 'Factory patches (on the ME-5)');
+    // The pedal still plays its old edit buffer - reload the current patch.
+    await sendMidi([PROGRAM_CHANGE | state.conn.channel, state.current]);
+    Ask.alert({ icon: 'success', title: 'Factory reset done', text: `${written} patches written to the ME-5.` });
+  } catch (e) {
+    Ask.alert({ icon: 'error', title: 'Factory reset failed', text: [e.message, 'Some patches may already have been overwritten.'] });
   }
 }
 
@@ -770,6 +818,7 @@ function wire() {
   });
   $('#lib-read').addEventListener('click', readFromMe5);
   $('#lib-repair').addEventListener('click', repairInvalid);
+  $('#lib-reset').addEventListener('click', factoryReset);
   $('#conn-status').addEventListener('click', openConnDialog);
   $('#conn-detect').addEventListener('click', autoDetect);
   $('#conn-use').addEventListener('click', () => {

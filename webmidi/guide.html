@@ -119,6 +119,7 @@
           <tr><td><strong>Load file…</strong> / <strong>Save file…</strong></td><td>Loads all 64 patches from a <code>.syx</code> file, or saves them to one (see <a href="#files">section 6</a>).</td></tr>
           <tr><td><strong>Read ME-5</strong></td><td>Reads all 64 patches from the ME-5. Only available when connected.</td></tr>
           <tr><td><strong>Repair N</strong></td><td>Only shown when a read found bad patches. See <a href="#repair">section 7</a>.</td></tr>
+          <tr><td><strong>Factory reset ME-5</strong></td><td>Only shown when connected. Writes all 64 factory patches into the ME-5, whatever the editor is showing. It asks first in a red warning box, and a progress bar shows the writing (about 7 seconds). <strong>This overwrites every sound of your own on the pedal</strong>, so make a backup first with Read ME-5 and Save file….</td></tr>
         </tbody>
       </table></div>
       <p>The label at the right end of the button row shows where the loaded patches came from (factory, file or ME-5).</p>
@@ -172,6 +173,7 @@
       <h2 id="repair"><span class="num">7</span>Repairing bad patches</h2>
       <p>If a patch slot in the ME-5's memory holds garbage (old pedals can get this from a flat backup battery), <strong>Read ME-5</strong> still reads the rest. The editor puts the factory sound in place of each bad patch and marks it with a dashed amber border in the patch map.</p>
       <p>The <strong>Repair N</strong> button then appears (N is the number of bad patches). After you confirm, it writes the factory sound into every bad slot on the ME-5.</p>
+      <p>To put every patch on the pedal back to factory, not just the bad ones, use the <strong>Factory reset ME-5</strong> button.</p>
       <p class="note">If repaired patches go bad again after the pedal has been switched off, the ME-5's backup battery probably needs replacing.</p>
 
       <h2 id="trouble"><span class="num">8</span>Troubleshooting</h2>

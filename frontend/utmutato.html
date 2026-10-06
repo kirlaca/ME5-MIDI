@@ -113,7 +113,7 @@
       <div class="table-wrap"><table>
         <thead><tr><th>Elem</th><th>Mit csinál</th></tr></thead>
         <tbody>
-          <tr><td>◀ ▶ és a kijelző</td><td>Patchváltás. A kijelzőn a patch neve (pl. <code>2-3-4</code> = bank 2, csoport 3, szám 4) és a sorszáma (<code>#0</code>–<code>#63</code>) látszik.</td></tr>
+          <tr><td>◀ ▶ és a kijelző</td><td>Patchváltás. A kijelzőn a patch neve (pl. <code>2-3-4</code> = 2. csoport, 3. bank, 4. patch, mint a pedálon) és a sorszáma (<code>#01</code>–<code>#64</code>) látszik.</td></tr>
           <tr><td><strong>EDIT</strong> jelzés</td><td>Pirosan világít, ha az aktuális patchet módosítottad, de még nem írtad vissza.</td></tr>
           <tr><td><strong>Write</strong></td><td>Beírja a módosított hangzást az aktuális patchbe. Kapcsolat esetén előbb megerősítést kér, mert felülírja a patchet az ME-5-ön. Bekapcsolt Auto write mellett nem kérdez, azonnal ír.</td></tr>
           <tr><td><strong>Revert</strong></td><td>Eldobja a módosításokat, és visszaállítja a patch eredeti értékeit, vagyis azt az állapotot, amelyben a patchre léptél. Ha az Auto write már beírta a módosítást, az eredetit is azonnal visszaírja.</td></tr>
@@ -121,6 +121,8 @@
           <tr><td><strong>Factory</strong></td><td>Betölti a 64 gyári patchet az editorba.</td></tr>
           <tr><td><strong>Load file…</strong> / <strong>Save file…</strong></td><td>Mind a 64 patchet <code>.syx</code> fájlba menti, vagy fájlból tölti be (részletek a <a href="#fajlok">7. pontban</a>).</td></tr>
           <tr><td><strong>Read ME-5</strong></td><td>Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható.</td></tr>
+          <tr><td><strong>Repair N</strong></td><td>Csak akkor látszik, ha a Read ME-5 hibás (értelmetlen adatot tartalmazó) patcheket talált; ezeket a patchtérkép szaggatott, borostyánszínű kerettel jelöli, és az editor a gyári hangzást mutatja helyettük. A gomb megerősítés után a gyári hangzást írja vissza ezekbe a patchekbe az ME-5-ön.</td></tr>
+          <tr><td><strong>Factory reset ME-5</strong></td><td>Csak csatlakozás után látszik. Mind a 64 gyári patchet beírja az ME-5-be, függetlenül attól, mi van éppen az editorban. Előtte egy piros figyelmeztető ablakban megerősítést kér; a folyamat kb. 7 másodperc, egy folyamatjelző mutatja. <strong>Ez a pedálon lévő összes saját hangzást felülírja</strong>, ezért előtte a Read ME-5 és a Save file… gombbal érdemes biztonsági mentést készíteni.</td></tr>
           <tr><td><strong>Útmutató</strong> / <strong>Bemutató</strong></td><td>Ez az oldal, illetve az ME-5 történetét bemutató oldal.</td></tr>
         </tbody>
       </table></div>
