@@ -7,6 +7,7 @@ const PROGRAM_CHANGE = 0xC0;
 const CONN_KEY = 'me5.webmidi.conn';
 
 // One skin per pedal the ME-5 models. Colours are approximations - tweak freely.
+// `dot` is a brighter stand-in for the patch map where the body colour vanishes on the dark panel.
 const SKINS = {
   cs2: { model: 'CS-2', name: 'Compression Sustainer', body: '#2f7fc1', ink: '#ffffff' },
   od2: { model: 'OD-2', name: 'OverDrive', body: '#f39a1e', ink: '#151515' },
@@ -14,9 +15,9 @@ const SKINS = {
   ds1: { model: 'DS-1', name: 'Distortion', body: '#ee6a1f', ink: '#151515' },
   ge7: { model: 'GE-7', name: 'Equalizer', body: '#c9cdd2', ink: '#151515' },
   ce2: { model: 'CE-2', name: 'Chorus', body: '#8fd0e8', ink: '#151515' },
-  bf2: { model: 'BF-2', name: 'Flanger', body: '#6b4c9a', ink: '#ffffff' },
+  bf2: { model: 'BF-2', name: 'Flanger', body: '#6b4c9a', ink: '#ffffff', dot: '#9d7bd8' },
   ns2: { model: 'NS-2', name: 'Noise Suppressor', body: '#ecebe4', ink: '#151515' },
-  rv2: { model: 'RV-2', name: 'Digital Reverb', body: '#27406f', ink: '#ffffff' },
+  rv2: { model: 'RV-2', name: 'Digital Reverb', body: '#27406f', ink: '#ffffff', dot: '#5b8def' },
   dd2: { model: 'DD-2', name: 'Digital Delay', body: '#e4e7ea', ink: '#151515' },
 };
 
@@ -541,7 +542,7 @@ function renderDisplay() {
 function renderPatchMap() {
   const map = $('#patch-map');
   map.replaceChildren();
-  const bitBlocks = CHAIN.filter(b => b.bit);
+  const pedals = CHAIN.filter(b => b.skin); // every pedal, NS included (it has no on/off bit)
   for (let g = 0; g < 4; g++) {
     const group = h('div', 'pm-group');
     const grid = h('div', 'pm-grid');
@@ -555,9 +556,12 @@ function renderPatchMap() {
       cell.title = `Patch ${patchLabel(n)}${invalid ? ' - invalid data on the ME-5, factory sound loaded' : ''}`;
       cell.append(h('span', '', `${Math.floor(i / 4) + 1}-${(i % 4) + 1}`));
       const dots = h('span', 'pm-dots');
-      for (const block of bitBlocks) {
+      for (const block of pedals) {
         const dot = h('span', 'pm-dot');
-        if (values.effects_on & bitOf(block.bit)) dot.style.background = SKINS[block.skin(values)].body;
+        if (isOn(block, values)) {
+          const skin = SKINS[block.skin(values)];
+          dot.style.background = skin.dot || skin.body;
+        }
         dots.append(dot);
       }
       cell.append(dots);
