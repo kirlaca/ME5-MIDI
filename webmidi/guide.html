@@ -86,6 +86,7 @@
         <li><strong>Straight from the file:</strong> double-click <code>index.html</code>. If the browser doesn't ask for MIDI permission this way, use the next option.</li>
         <li><strong>From a local server:</strong> in the project folder run <code>npx serve webmidi</code> or <code>python -m http.server -d webmidi</code>, then open the <code>http://localhost:…</code> address it prints.</li>
       </ul>
+      <p><strong>Works without internet:</strong> once you've opened it from the web address, the browser keeps a copy of the editor and the guide, so next time it loads from the same address with no internet, e.g. at a rehearsal room. When you're online, the latest version always loads. Clearing the browser's site data removes the saved copy; just open it once more while online.</p>
       <p class="note"><strong>Important:</strong> don't run the Python editor's server at the same time. On Windows only one program can hold a MIDI port open, so the two editors would take the port from each other.</p>
 
       <h2 id="connect"><span class="num">3</span>Connecting to the ME-5</h2>

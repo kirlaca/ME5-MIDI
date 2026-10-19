@@ -20,6 +20,9 @@ az editor fejlécéből is elérhetők.
 - Nyisd meg az `index.html`-t. Ha a böngésző `file://`-ról nem kér MIDI engedélyt, szolgáld ki
   localhostról, pl. `npx serve webmidi` vagy `python -m http.server -d webmidi`, és nyisd meg a
   kiírt `http://localhost:...` címet. HTTPS-en (pl. GitHub Pages) bárhonnan működik.
+- Offline mód: a gyökérben lévő `sw.js` service worker (az `app.js` regisztrálja) első megnyitáskor
+  elmenti az editort és az útmutatókat. Hálózat-először működik: online mindig a friss változat jön,
+  net nélkül a mentett. Csak akkor aktív, ha a repó gyökere van kiszolgálva (GitHub Pages).
 - Az első csatlakozáskor a böngésző engedélyt kér a MIDI eszközökhöz / SysEx-hez – ezt engedélyezni kell.
 - A Python szerver és ez a lap ne fusson egyszerre: Windowson egy MIDI portot egyszerre csak egy
   program tarthat nyitva.

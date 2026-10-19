@@ -876,6 +876,14 @@ function init() {
   setLibrary(state.factory, 'Factory patches');
   renderStatus();
   restoreConnection();
+  registerOffline();
+}
+
+// The service worker sits at the site root (../sw.js) so it covers the root redirect
+// too. Served from webmidi/ itself (npx serve webmidi) or file:// it just isn't there.
+function registerOffline() {
+  if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
+  navigator.serviceWorker.register('../sw.js').catch(() => { /* no offline mode here */ });
 }
 
 init();
