@@ -143,6 +143,7 @@ A jobb oldali felirat mutatja, honnan származnak az éppen betöltött patchek 
 |---|---|
 | „Can't reach the backend” | A szerver nem fut. Indítsd el a 3. pont szerint. |
 | Az Auto-detect nem találja az ME-5-öt | Ellenőrizd, hogy az ME-5 Play módban van. Ellenőrizd a MIDI IN/OUT bekötést: az ME-5 MIDI OUT-ja az interfész bemenetére menjen, a MIDI IN-je a kimenetére. Ha a kézi portválasztással a patchváltás működik, de a SysEx nem, akkor a kábel nem viszi át a SysEx üzeneteket (lásd 1. pont). |
+| A saját ME-5-tel működik, egy másikkal nem | A program nincs egy adott pedálhoz kötve, bármelyik ME-5-tel működik. A pedálok MIDI csatornája viszont eltérhet. Használd az **Auto-detect**-ot, ez mind a 16 csatornán keresi a pedált. Kézi portválasztásnál az **ME-5 MIDI channel** mezőben a másik pedál csatornáját add meg. Ha így sem találja: a MIDI OUT és a MIDI IN kábel is legyen bekötve (a beolvasáshoz mindkettő kell), az ME-5 legyen Play módban, egy másik program (pl. DAW) ne foglalja a portot, és ha másik interfészt használsz, az is vigye át a SysEx-et (lásd 1. pont). |
 | Az editor beállításai nem hallatszanak, a Read ME-5 nem működik, de a patchváltás igen | Az ME-5 valószínűleg Edit módban van. Állítsd Play módba. |
 | A „Read ME-5” gomb szürke | Előbb csatlakozz (4. pont). |
 | A Read vagy a Write hibát jelez | A SysEx nem jut át. Ugyanaz az ok, mint fent. |
