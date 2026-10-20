@@ -33,7 +33,7 @@ A program arjenv [Boss-ME5-MIDI-Editor](https://github.com/arjenv/Boss-ME5-MIDI-
 4. Kapcsold be az ME-5-öt. A MIDI csatorna bármelyik lehet (1–16): az Auto-detect megkeresi, kézi csatlakozásnál pedig te adod meg. Az ME-5 legyen **Play módban**: Edit módban nem fogad SysEx-et, így az editor nem tudja sem beolvasni, sem állítani a hangokat, csak a patchváltás működik.
 5. Indítsd el a programot (3. pont), és csatlakozz a 4. pont szerint.
 
-**Próba:** csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Ezután a **Read ME-5** gombbal ellenőrizheted, hogy a SysEx is átmegy-e: ha sikerül, a program kiolvassa mind a 64 patchet.
+**Próba:** csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Csatlakozás után az editor magától kiolvassa mind a 64 patchet a pedálból, ez a SysEx-et is ellenőrzi. Ha nem sikerül, a csatlakozás gombon *not read* látszik, és amíg a **Read ME-5** nem sikerül, az editor nem küld változtatást a pedálra.
 
 ## 2. Első telepítés
 
@@ -83,7 +83,7 @@ Offline módban minden szerkesztés csak az editorban történik, az ME-5-re nem
 | **Revert** | Eldobja a módosításokat, és visszaállítja a patch eredeti értékeit. |
 | **Factory** | Betölti a 64 gyári patchet az editorba. |
 | **Load file…** / **Save file…** | Mind a 64 patchet `.syx` fájlba menti, vagy fájlból tölti be (részletek a 7. pontban). |
-| **Read ME-5** | Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható. |
+| **Read ME-5** | Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható. Csatlakozáskor az editor egyszer magától is lefuttatja. |
 | **Repair N** | Csak akkor látszik, ha a Read ME-5 hibás (értelmetlen adatot tartalmazó) patcheket talált; ezeket a patchtérkép szaggatott, borostyánszínű kerettel jelöli, és az editor a gyári hangzást mutatja helyettük. A gomb megerősítés után a gyári hangzást írja vissza ezekbe a patchekbe az ME-5-ön. |
 | **Factory reset ME-5** | Csak csatlakozás után látszik. Mind a 64 gyári patchet beírja az ME-5-be, függetlenül attól, mi van éppen az editorban. Előtte egy piros figyelmeztető ablakban megerősítést kér; a folyamat kb. 7 másodperc, egy folyamatjelző mutatja. **Ez a pedálon lévő összes saját hangzást felülírja**, ezért előtte a Read ME-5 és a Save file… gombbal érdemes biztonsági mentést készíteni. |
 | **Útmutató** / **Bemutató** | Ez a használati utasítás, illetve az ME-5 történetét bemutató oldal, az editorból megnyitva. |

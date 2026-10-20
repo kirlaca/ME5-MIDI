@@ -42,6 +42,10 @@ const state = {
   conn: null,      // {output, input, channel} when talking to a real ME-5; channel 0-15 is also the SysEx device ID
   original: null,  // the patch as it was when selected - Revert returns here, even after an auto write
   autoWrite: false,
+  // Connected, but the library is still the editor's startup guess (factory sounds), not
+  // what the pedal holds. Nothing is sent or auto-written then, so a knob turn can't
+  // replace the user's own sound. Cleared when a library is read, loaded or picked.
+  needsRead: false,
   // Last sub-mode per pedal, so flipping CE-2 -> BF-2 -> CE-2 or RV-3 -> DD-2 -> RV-3 comes back where it was.
   mem: { flanger: 1, reverb: 0, ns: 4 },
 };
@@ -210,19 +214,22 @@ function setLibrary(patches, source) {
   state.library = library;
   state.invalid = new Set(patches.filter(p => p.invalid).map(p => p.patch_number));
   state.source = source;
+  state.needsRead = false;
   selectPatch(state.current, { send: false });
+  renderStatus();
 }
 
 // ---------------------------------------------------------------- MIDI
 
 let tempTimer;
 function queueTempSend() {
-  if (!state.conn) return;
+  if (!state.conn || state.needsRead) return;
   clearTimeout(tempTimer);
   tempTimer = setTimeout(sendTemp, 120);
 }
 
 async function sendTemp() {
+  if (!state.conn || state.needsRead) return;
   try {
     const { data } = await api('/api/patch/encode', { values: state.values, patch_number: null, channel: state.conn.channel });
     await sendMidi(data);
@@ -241,7 +248,7 @@ let autoTimer = null;
 
 function queueAutoWrite() {
   cancelAutoWrite();
-  if (!state.autoWrite || !isDirty()) return;
+  if (!state.autoWrite || !isDirty() || (state.conn && state.needsRead)) return;
   autoTimer = setTimeout(() => {
     autoTimer = null;
     renderAutoPending();
@@ -281,9 +288,11 @@ function renderAutoPending() {
 
 function connect(ports) {
   state.conn = ports;
+  state.needsRead = Boolean(ports);
   renderStatus();
   $('#conn-dialog').close();
-  toast(ports ? 'Connected. Press "Read ME-5" to pull its patches.' : 'Offline - edits stay in the editor.');
+  if (ports) readFromMe5(); // start from what the pedal really holds
+  else toast('Offline - edits stay in the editor.');
 }
 
 // ---------------------------------------------------------------- controls
@@ -560,7 +569,9 @@ function renderRepair() {
 function renderStatus() {
   const btn = $('#conn-status');
   btn.classList.toggle('online', Boolean(state.conn));
-  $('#conn-text').textContent = state.conn ? `${state.conn.output} · ch ${state.conn.channel + 1}` : 'Offline';
+  $('#conn-text').textContent = state.conn
+    ? `${state.conn.output} · ch ${state.conn.channel + 1}${state.needsRead ? ' · not read' : ''}`
+    : 'Offline';
   $('#lib-read').disabled = !state.conn;
   renderRepair();
 }
@@ -578,12 +589,18 @@ async function writePatch({ auto = false } = {}) {
   const n = state.current;
   const values = { ...state.values };
   const label = patchLabel(n);
+  // An auto write queued before connecting would store the factory-based guess.
+  if (auto && state.conn && state.needsRead) return;
   // Turning auto write on is the consent - no dialog then.
-  if (state.conn && !auto && !state.autoWrite && !await Ask.confirm({
-    icon: 'question',
+  if (state.conn && !auto && (state.needsRead || !state.autoWrite) && !await Ask.confirm({
+    icon: state.needsRead ? 'danger' : 'question',
     title: `Write patch ${label}?`,
-    text: 'The edited sound replaces this patch on the ME-5.',
+    text: state.needsRead
+      ? ['The edited sound replaces this patch on the ME-5.',
+        'The ME-5 has not been read yet: this sound starts from the factory patch, not from what the pedal holds.']
+      : 'The edited sound replaces this patch on the ME-5.',
     confirmText: 'Write',
+    danger: state.needsRead,
   })) return;
   cancelAutoWrite();
   try {
@@ -630,7 +647,9 @@ async function readFromMe5() {
       ? `Read 64 patches - ${bad} held invalid data and show the factory sound. Repair writes it back.`
       : 'Read 64 patches from the ME-5', bad ? 'error' : '');
   } catch (e) {
-    toast(`Read failed: ${e.message}`, 'error');
+    toast(state.needsRead
+      ? `Read failed: ${e.message}. Edits are not sent to the ME-5 until it is read.`
+      : `Read failed: ${e.message}`, 'error');
   } finally {
     btn.textContent = 'Read ME-5';
     renderStatus();
