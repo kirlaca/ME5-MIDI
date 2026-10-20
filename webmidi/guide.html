@@ -106,7 +106,7 @@
       </ol>
       <p>The editor remembers the ports you used last. When you reload the page it reconnects by itself if the interface is plugged in. If you unplug the interface while working, it switches to offline.</p>
       <p>When offline, all edits stay in the editor; nothing reaches the ME-5.</p>
-      <p class="note"><strong>Quick test:</strong> after connecting, change patch with ◀ ▶. If the number on the ME-5's display changes too, the connection works. Then press <strong>Read ME-5</strong> to check SysEx: if it succeeds, all 64 patches are read from the pedal.</p>
+      <p class="note"><strong>Quick test:</strong> after connecting, change patch with ◀ ▶. If the number on the ME-5's display changes too, the connection works. Right after connecting, the editor also reads all 64 patches from the pedal, which checks SysEx: if it fails, the connection button shows <em>not read</em>, and edits are not sent to the pedal until <strong>Read ME-5</strong> succeeds.</p>
 
       <h2 id="screen"><span class="num">4</span>The screen</h2>
       <h3>Top bar</h3>
@@ -120,7 +120,7 @@
           <tr><td><strong>Auto write</strong></td><td>When on, the sound is written into the current patch 5 seconds after your last change, without asking. A bar along the bottom of the Write button shows the countdown. A pending write is stored at once when you change patch. The setting is remembered.</td></tr>
           <tr><td><strong>Factory</strong></td><td>Loads the 64 factory patches into the editor (this does not send them to the ME-5).</td></tr>
           <tr><td><strong>Load file…</strong> / <strong>Save file…</strong></td><td>Loads all 64 patches from a <code>.syx</code> file, or saves them to one (see <a href="#files">section 6</a>).</td></tr>
-          <tr><td><strong>Read ME-5</strong></td><td>Reads all 64 patches from the ME-5. Only available when connected.</td></tr>
+          <tr><td><strong>Read ME-5</strong></td><td>Reads all 64 patches from the ME-5. Only available when connected. Connecting does this once automatically.</td></tr>
           <tr><td><strong>Repair N</strong></td><td>Only shown when a read found bad patches. See <a href="#repair">section 7</a>.</td></tr>
           <tr><td><strong>Factory reset ME-5</strong></td><td>Only shown when connected. Writes all 64 factory patches into the ME-5, whatever the editor is showing. It asks first in a red warning box, and a progress bar shows the writing (about 7 seconds). <strong>This overwrites every sound of your own on the pedal</strong>, so make a backup first with Read ME-5 and Save file….</td></tr>
         </tbody>

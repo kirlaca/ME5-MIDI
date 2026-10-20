@@ -106,7 +106,7 @@
       </ol>
       <p>Az editor megjegyzi a legutóbb használt portokat. Az oldal újratöltésekor magától visszacsatlakozik, ha az interfész be van dugva. Ha menet közben kihúzod az interfészt, offline módba vált.</p>
       <p>Offline módban minden szerkesztés csak az editorban történik, az ME-5-re nem jut el semmi.</p>
-      <p class="note"><strong>Próba:</strong> csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Ezután a <strong>Read ME-5</strong> gombbal ellenőrizheted, hogy a SysEx is átmegy-e: ha sikerül, a program kiolvassa mind a 64 patchet.</p>
+      <p class="note"><strong>Próba:</strong> csatlakozás után a ◀ ▶ gombbal válts patchet. Ha az ME-5 kijelzőjén is átvált a szám, a kapcsolat működik. Csatlakozás után az editor magától kiolvassa mind a 64 patchet a pedálból, ez a SysEx-et is ellenőrzi. Ha nem sikerül, a csatlakozás gombon <em>not read</em> látszik, és amíg a <strong>Read ME-5</strong> nem sikerül, az editor nem küld változtatást a pedálra.</p>
 
       <h2 id="kepernyo"><span class="num">4</span>A képernyő részei</h2>
       <h3>Felső sáv</h3>
@@ -120,7 +120,7 @@
           <tr><td><strong>Auto write</strong></td><td>Bekapcsolva az utolsó változtatás után 5 másodperccel magától beírja a hangzást az aktuális patchbe, megerősítés nélkül. A Write gomb alján futó csík mutatja, mennyi van hátra. Patchváltáskor a függő módosítást azonnal beírja. A beállítást az editor megjegyzi.</td></tr>
           <tr><td><strong>Factory</strong></td><td>Betölti a 64 gyári patchet az editorba (az ME-5-re ettől nem kerülnek át).</td></tr>
           <tr><td><strong>Load file…</strong> / <strong>Save file…</strong></td><td>Mind a 64 patchet <code>.syx</code> fájlból tölti be, vagy fájlba menti (részletek a <a href="#fajlok">6. pontban</a>).</td></tr>
-          <tr><td><strong>Read ME-5</strong></td><td>Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható.</td></tr>
+          <tr><td><strong>Read ME-5</strong></td><td>Kiolvassa mind a 64 patchet az ME-5-ből. Csak csatlakozás után használható. Csatlakozáskor az editor egyszer magától is lefuttatja.</td></tr>
           <tr><td><strong>Repair N</strong></td><td>Csak akkor látszik, ha a beolvasásnál hibás patchek voltak. Lásd a <a href="#javitas">7. pontot</a>.</td></tr>
           <tr><td><strong>Factory reset ME-5</strong></td><td>Csak csatlakozás után látszik. Mind a 64 gyári patchet beírja az ME-5-be, függetlenül attól, mi van éppen az editorban. Előtte egy piros figyelmeztető ablakban megerősítést kér; a folyamat kb. 7 másodperc, egy folyamatjelző mutatja. <strong>Ez a pedálon lévő összes saját hangzást felülírja</strong>, ezért előtte a Read ME-5 és a Save file… gombbal érdemes biztonsági mentést készíteni.</td></tr>
         </tbody>

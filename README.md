@@ -26,7 +26,7 @@ No install needed: the editor runs entirely in Chrome or Edge using the Web MIDI
 1. Connect the interface and put the ME-5 in **Play mode**. In Edit mode the pedal ignores SysEx.
 2. Open the editor and allow MIDI / SysEx access when the browser asks.
 3. Use auto-detect, or pick the MIDI ports and the channel yourself. The SysEx device ID is the pedal's MIDI channel − 1, and detection finds it automatically.
-4. Press **Read ME-5** to load the patches from the pedal.
+4. After connecting, the editor reads all 64 patches from the pedal by itself. Until that read succeeds, edits are not sent to the pedal (the status shows "not read"), so a knob turn can't replace your own sound with a factory one. **Read ME-5** reads again at any time.
 
 User guides: [English](webmidi/guide.html) · [Magyar](webmidi/utmutato.html). They can also be opened from the editor's header.
 
