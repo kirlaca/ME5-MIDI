@@ -58,6 +58,10 @@ Then open the printed `http://localhost:...` address. Browsers may refuse MIDI a
 
 Only one program can hold a MIDI port on Windows, so do not run the Python backend and the Web MIDI page at the same time.
 
+## Visitor statistics
+
+The GitHub Pages build counts page views with [GoatCounter](https://www.goatcounter.com/) (`webmidi/index.html`, `guide.html`, `utmutato.html`). It sets no cookies and sends only the page path, the referrer and the screen size, never any MIDI or patch data. Views from `localhost` are not counted, and nothing is sent while offline. Statistics: https://me5-midi.goatcounter.com/
+
 ## Credits and license
 
 This project started as a fork of [arjenv/Boss-ME5-MIDI-Editor](https://github.com/arjenv/Boss-ME5-MIDI-Editor), a Raspberry Pi + PHP web interface for the ME-5. The editor has since been rewritten, but the MIDI parameter map is based on that work.
