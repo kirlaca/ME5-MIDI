@@ -60,7 +60,20 @@ Only one program can hold a MIDI port on Windows, so do not run the Python backe
 
 ## Visitor statistics
 
-The GitHub Pages build counts page views with [GoatCounter](https://www.goatcounter.com/) (`webmidi/index.html`, `guide.html`, `utmutato.html`). It sets no cookies and sends only the page path, the referrer and the screen size, never any MIDI or patch data. Views from `localhost` are not counted, and nothing is sent while offline. Statistics: https://me5-midi.goatcounter.com/
+The GitHub Pages build counts page views with [GoatCounter](https://www.goatcounter.com/) (`webmidi/index.html`, `guide.html`, `utmutato.html`). It sets no cookies and sends only the page path, the referrer and the screen size, never any MIDI or patch data. Views from `localhost` are not counted, and nothing is sent while offline. The editor also counts a few actions as GoatCounter events (only the event name is sent):
+
+| Event | When |
+|---|---|
+| `no-webmidi` | The page was opened in a browser without Web MIDI (Safari, iOS) |
+| `midi-denied` | The browser refused MIDI / SysEx access |
+| `connect-auto`, `connect-manual`, `reconnect` | Connected by auto-detect, by picking ports, or restored from the last session |
+| `detect-not-found` | Auto-detect found no ME-5 |
+| `read-me5`, `read-me5-invalid`, `read-me5-failed` | Read ME-5 succeeded, found invalid patches, or failed |
+| `write-patch`, `write-patch-offline`, `auto-write-on` | A patch was written by hand (to the pedal / editor only), auto write was turned on |
+| `load-factory`, `load-file`, `save-file` | Library actions |
+| `repair`, `factory-reset` | Repair and factory reset finished |
+
+Statistics: https://me5-midi.goatcounter.com/
 
 ## Credits and license
 

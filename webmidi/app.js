@@ -132,6 +132,14 @@ function toast(message, kind = '') {
   toastTimer = setTimeout(() => el.classList.remove('show'), kind === 'error' ? 6000 : 2800);
 }
 
+// Counts an action as a GoatCounter event (script in index.html, see README). Only the
+// event name is sent. Silently does nothing when the script is blocked, offline or on localhost.
+function track(event) {
+  const send = () => { try { window.goatcounter?.count?.({ path: event, event: true }); } catch { /* not counted */ } };
+  // The async counter script is in by the load event; earlier events wait for it.
+  if (document.readyState === 'complete') send(); else window.addEventListener('load', send, { once: true });
+}
+
 const patchLabel = n => `${Math.floor(n / 16) + 1}-${Math.floor((n % 16) / 4) + 1}-${(n % 4) + 1}`;
 
 function maxOf(key, v) {
@@ -256,6 +264,7 @@ function setAutoWrite(on) {
   state.autoWrite = on;
   try { localStorage.setItem(AUTO_WRITE_KEY, on ? '1' : '0'); } catch { /* storage blocked */ }
   $('#auto-write').checked = on;
+  if (on) track('auto-write-on');
   queueAutoWrite();
 }
 
@@ -291,6 +300,7 @@ async function restoreConnection() {
       state.conn = saved;
       renderStatus();
       toast(`Reconnected to ${saved.output} · ch ${saved.channel + 1}`);
+      track('reconnect');
     }
   } catch { /* stay offline; the connection dialog shows the reason */ }
 }
@@ -617,6 +627,7 @@ async function writePatch({ auto = false } = {}) {
     refreshIndicators();
     const where = state.conn ? label : `${label} (editor only - offline)`;
     toast(auto ? `Auto-written to ${where}` : `Written to ${where}`);
+    if (!auto) track(state.conn ? 'write-patch' : 'write-patch-offline');
   } catch (e) {
     toast(`${auto ? 'Auto write' : 'Write'} failed: ${e.message}`, 'error');
   }
@@ -633,6 +644,7 @@ function revert() {
 
 function loadFactory() {
   setLibrary(state.factory, 'Factory patches');
+  track('load-factory');
 }
 
 async function readFromMe5() {
@@ -645,8 +657,10 @@ async function readFromMe5() {
     toast(bad
       ? `Read 64 patches - ${bad} held invalid data and show the factory sound. Repair writes it back.`
       : 'Read 64 patches from the ME-5', bad ? 'error' : '');
+    track(bad ? 'read-me5-invalid' : 'read-me5');
   } catch (e) {
     toast(`Read failed: ${e.message}`, 'error');
+    track('read-me5-failed');
   } finally {
     btn.textContent = 'Read ME-5';
     renderStatus();
@@ -685,6 +699,7 @@ async function repairInvalid() {
   try {
     await writeMany('Repairing patches', todo.map(n => [n, state.library[n]]), n => state.invalid.delete(n));
     toast(`Repaired ${todo.length} patches`);
+    track('repair');
   } catch (e) {
     Ask.alert({ icon: 'error', title: 'Repair failed', text: e.message });
   } finally {
@@ -711,6 +726,7 @@ async function factoryReset() {
     setLibrary(state.factory, 'Factory patches (on the ME-5)');
     // The pedal still plays its old edit buffer - reload the current patch.
     sendMidi([PROGRAM_CHANGE | state.conn.channel, state.current]);
+    track('factory-reset');
     Ask.alert({ icon: 'success', title: 'Factory reset done', text: `${written} patches written to the ME-5.` });
   } catch (e) {
     Ask.alert({ icon: 'error', title: 'Factory reset failed', text: [e.message, 'Some patches may already have been overwritten.'] });
@@ -728,6 +744,7 @@ function loadFile(file) {
       const patches = ME5.decodeDump(new Uint8Array(reader.result));
       setLibrary(patches, `File · ${file.name}`);
       toast(`Loaded ${file.name}`);
+      track('load-file');
     } catch (e) {
       toast(`Load failed: ${e.message}`, 'error');
     }
@@ -758,6 +775,7 @@ async function saveFile() {
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     $('#file-dialog').close();
     toast(`Saved ${filename}${isDirty() ? ' (unwritten edits not included)' : ''}`);
+    track('save-file');
   } catch (e) {
     toast(`Save failed: ${e.message}`, 'error');
   }
@@ -800,6 +818,7 @@ async function openConnDialog() {
     fillPortLists();
   } catch (e) {
     msg.textContent = e.message;
+    if (navigator.requestMIDIAccess) track('midi-denied'); // no Web MIDI at all is counted on load
   }
 }
 
@@ -810,8 +829,13 @@ async function autoDetect() {
   try {
     await Midi.init();
     const found = await Midi.detectMe5();
-    if (found) connect(found);
-    else $('#conn-msg').textContent = 'ME-5 not found on any MIDI port. Is it in Play mode (not Edit)?';
+    if (found) {
+      connect(found);
+      track('connect-auto');
+    } else {
+      $('#conn-msg').textContent = 'ME-5 not found on any MIDI port. Is it in Play mode (not Edit)?';
+      track('detect-not-found');
+    }
   } catch (e) {
     $('#conn-msg').textContent = e.message;
   } finally {
@@ -848,7 +872,9 @@ function wire() {
     const output = $('#port-out').value;
     const input = $('#port-in').value;
     const channel = Number($('#port-channel').value);
-    if (output) connect({ output, input, channel });
+    if (!output) return;
+    connect({ output, input, channel });
+    track('connect-manual');
   });
   $('#conn-disconnect').addEventListener('click', () => connect(null));
 
@@ -877,6 +903,8 @@ function init() {
   renderStatus();
   restoreConnection();
   registerOffline();
+  // Visitors on Safari / iOS can never connect - worth knowing how many arrive.
+  if (!navigator.requestMIDIAccess) track('no-webmidi');
 }
 
 // The service worker sits at the site root (../sw.js) so it covers the root redirect
